@@ -1,0 +1,242 @@
+[
+  {
+    "name": "Dengue Clássica",
+    "category": "Infecciosas",
+    "symptoms": ["Pirexia abrupta", "Artralgia", "Mialgia", "Exantema maculopapular", "Cefaleia retro-orbitária"],
+    "medications": ["Paracetamol", "Dipirona"],
+    "description_pro": "Arbovirose febril aguda causada pelo vírus DENV, transmitida pelo Aedes aegypti.",
+    "description_plain": "Doença transmitida por mosquito que causa febre alta, dores no corpo e manchas vermelhas."
+  },
+  {
+    "name": "Diabetes Mellitus Tipo 2",
+    "category": "Metabólicas",
+    "symptoms": ["Poliúria", "Polidipsia", "Polifagia", "Astenia", "Visão turva"],
+    "medications": ["Metformina", "Glibenclamida"],
+    "description_pro": "Distúrbio metabólico caracterizado por hiperglicemia persistente e resistência à insulina.",
+    "description_plain": "Aumento do açúcar no sangue que causa muita sede, fome excessiva e cansaço."
+  },
+  {
+    "name": "Hipertensão Arterial Sistêmica",
+    "category": "Cardiovasculares",
+    "symptoms": ["Cefaleia occipital", "Tontura", "Escotomas cintilantes", "Zumbido", "Precordialgia"],
+    "medications": ["Losartana", "Enalapril", "Amlodipino"],
+    "description_pro": "Condição clínica multifatorial caracterizada por níveis elevados da pressão arterial (≥140/90 mmHg).",
+    "description_plain": "Pressão alta, que pode causar dor de cabeça, tontura e visão com 'pontinhos brilhantes'."
+  },
+  {
+    "name": "Pneumonia Bacteriana",
+    "category": "Respiratórias",
+    "symptoms": ["Tosse produtiva", "Expectoração purulenta", "Dispneia", "Taquipneia", "Estertores crepitantes"],
+    "medications": ["Amoxicilina", "Azitromicina"],
+    "description_pro": "Infecção do parênquima pulmonar, geralmente por Streptococcus pneumoniae, com exsudato alveolar.",
+    "description_plain": "Infecção nos pulmões que causa tosse com catarro, febre e dificuldade para respirar."
+  },
+  {
+    "name": "Infarto Agudo do Miocárdio",
+    "category": "Cardiovasculares",
+    "symptoms": ["Precordialgia opressiva", "Diaforese", "Náusea", "Irradiação para membro superior esquerdo", "Síncope"],
+    "medications": ["Ácido Acetilsalicílico", "Clopidogrel", "Nitroglicerina"],
+    "description_pro": "Necrose isquêmica do miocárdio resultante da obstrução aguda de uma artéria coronária.",
+    "description_plain": "Ataque cardíaco. Dor forte no peito que aperta, suor frio e dor que vai para o braço."
+  },
+  {
+    "name": "Apendicite Aguda",
+    "category": "Gastrointestinais",
+    "symptoms": ["Dor em fossa ilíaca direita", "Anorexia", "Êmese", "Sinal de Blumberg positivo", "Pirexia leve"],
+    "medications": ["Ceftriaxona", "Metronidazol"],
+    "description_pro": "Inflamação do apêndice vermiforme, geralmente por obstrução do lúmen por fecalito.",
+    "description_plain": "Inflamação do apêndice que causa dor forte do lado direito da barriga e vômitos."
+  },
+  {
+    "name": "Anemia Ferropriva",
+    "category": "Hematológicas",
+    "symptoms": ["Palidez cutâneo-mucosa", "Glossite", "Coiloníquia", "Pica (perversão do apetite)", "Taquicardia"],
+    "medications": ["Sulfato Ferroso"],
+    "description_pro": "Deficiência de ferro levando à redução da síntese de hemoglobina e eritrócitos microcíticos.",
+    "description_plain": "Falta de ferro no sangue que deixa a pessoa pálida, cansada e com unhas fracas."
+  },
+  {
+    "name": "Hipotireoidismo",
+    "category": "Endócrinas",
+    "symptoms": ["Bradicardia", "Bradipsiquismo", "Intolerância ao frio", "Mixedema", "Alopecia lateral das sobrancelhas"],
+    "medications": ["Levotiroxina Sódica"],
+    "description_pro": "Deficiência de hormônios tireoidianos (T3 e T4), resultando em lentificação generalizada do metabolismo.",
+    "description_plain": "Glândula tireoide preguiçosa, causando cansaço, batimentos lentos e frio constante."
+  },
+  {
+    "name": "Infecção do Trato Urinário (Cistite)",
+    "category": "Urológicas",
+    "symptoms": ["Disúria", "Polaciúria", "Urgência miccional", "Nictúria", "Dor suprapúbica"],
+    "medications": ["Nitrofurantoína", "Norfloxacino"],
+    "description_pro": "Colonização bacteriana da bexiga, manifestando-se com irritação vesical.",
+    "description_plain": "Infecção na bexiga que causa dor ao urinar e vontade de ir ao banheiro toda hora."
+  },
+  {
+    "name": "Asma Brônquica",
+    "category": "Respiratórias",
+    "symptoms": ["Sibilos expiratórios", "Tosse seca", "Opressão torácica", "Ortopneia", "Tiragem intercostal"],
+    "medications": ["Salbutamol", "Fluticasona"],
+    "description_pro": "Doença inflamatória crônica das vias aéreas com hiperresponsividade brônquica e obstrução reversível.",
+    "description_plain": "Cansaço no peito que causa chiado, falta de ar e tosse, geralmente pior à noite."
+  },
+  {
+    "name": "Colelitíase",
+    "category": "Gastrointestinais",
+    "symptoms": ["Cólica biliar", "Icterícia", "Hipocolia fecal", "Colúria", "Sinal de Murphy positivo"],
+    "medications": ["Escopolamina", "Dipirona"],
+    "description_pro": "Presença de cálculos no interior da vesícula biliar ou ductos biliares.",
+    "description_plain": "Pedras na vesícula que causam dor forte na barriga após comer e olhos amarelados."
+  },
+  {
+    "name": "Gripe (Influenza)",
+    "category": "Infecciosas",
+    "symptoms": ["Coriza", "Odinofagia", "Mialgia generalizada", "Prostração", "Pirexia"],
+    "medications": ["Oseltamivir", "Paracetamol"],
+    "description_pro": "Infecção viral respiratória aguda causada pelo vírus Influenza, com alto potencial de contágio.",
+    "description_plain": "Resfriado forte com dor no corpo, dor de garganta, febre e nariz escorrendo."
+  },
+  {
+    "name": "Gastrite Aguda",
+    "category": "Gastrointestinais",
+    "symptoms": ["Epigastralgia", "Pirose", "Plenitude pós-prandial", "Eructação", "Hematêmese"],
+    "medications": ["Omeprazol", "Hidróxido de Alumínio"],
+    "description_pro": "Inflamação da mucosa gástrica por agentes erosivos ou infecção por H. pylori.",
+    "description_plain": "Inflamação no estômago que causa queimação, azia e sensação de estômago cheio."
+  },
+  {
+    "name": "Insuficiência Cardíaca Congestiva",
+    "category": "Cardiovasculares",
+    "symptoms": ["Edema de membros inferiores", "Dispneia paroxística noturna", "Estase jugular", "Hepatomegalia", "Estertores pulmonares"],
+    "medications": ["Furosemida", "Espironolactona", "Digoxina"],
+    "description_pro": "Incapacidade do coração em bombear sangue suficiente para suprir as demandas metabólicas teciduais.",
+    "description_plain": "Coração fraco que causa inchaço nas pernas e falta de ar ao deitar."
+  },
+  {
+    "name": "Acidente Vascular Encefálico (AVE)",
+    "category": "Neurológicas",
+    "symptoms": ["Hemiparesia", "Afasia", "Assimetria facial", "Disartria", "Hemianopsia"],
+    "medications": ["Alteplase", "AAS"],
+    "description_pro": "Déficit neurológico focal súbito por isquemia ou hemorragia no parênquima cerebral.",
+    "description_plain": "Derrame. Perda de força em um lado do corpo, dificuldade para falar e boca torta."
+  },
+  {
+    "name": "Artrite Reumatóide",
+    "category": "Reumatológicas",
+    "symptoms": ["Rigidez matinal", "Poliartrite simétrica", "Edema articular", "Deformidades em 'pescoço de cisne'", "Nódulos reumatóides"],
+    "medications": ["Metotrexato", "Prednisona"],
+    "description_pro": "Doença autoimune sistêmica crônica que ataca principalmente as sinóvias articulares.",
+    "description_plain": "Doença nas juntas que causa dor, inchaço e dificuldade de movimento, principalmente de manhã."
+  },
+  {
+    "name": "Doença de Alzheimer",
+    "category": "Neurológicas",
+    "symptoms": ["Amnésia anterógrada", "Afasia", "Apraxia", "Agnosia", "Desorientação têmporo-espacial"],
+    "medications": ["Donepezila", "Memantina"],
+    "description_pro": "Doença neurodegenerativa progressiva caracterizada por placas senis e emaranhados neurofibrilares.",
+    "description_plain": "Perda de memória progressiva, confusão mental e dificuldade para realizar tarefas simples."
+  },
+  {
+    "name": "Candidíase Vaginal",
+    "category": "Ginecológicas",
+    "symptoms": ["Prurido vulvovaginal", "Leucorreia grumosa", "Dispareunia", "Disúria externa", "Edema vulvar"],
+    "medications": ["Fluconazol", "Nistatina"],
+    "description_pro": "Infecção fúngica vulvovaginal causada por Candida albicans.",
+    "description_plain": "Infecção por fungo que causa muita coceira, corrimento branco e dor na relação sexual."
+  },
+  {
+    "name": "Hepatite Viral A",
+    "category": "Infecciosas",
+    "symptoms": ["Icterícia", "Colúria", "Hipocolia", "Hepatomegalia dolorosa", "Náusea"],
+    "medications": ["Sintomáticos"],
+    "description_pro": "Inflamação hepática aguda causada pelo vírus HAV, transmitida por via fecal-oral.",
+    "description_plain": "Inflamação no fígado que deixa a pele amarela, urina escura e fezes claras."
+  },
+  {
+    "name": "Enxaqueca (Migrânea)",
+    "category": "Neurológicas",
+    "symptoms": ["Cefaleia pulsátil unilateral", "Fotofobia", "Fonofobia", "Osmofobia", "Aura visual"],
+    "medications": ["Sumatriptana", "Naproxeno"],
+    "description_pro": "Cefaleia primária recorrente associada a disfunção do sistema trigeminovascular.",
+    "description_plain": "Dor de cabeça forte de um lado só, com sensibilidade à luz e ao barulho."
+  },
+  {
+    "name": "Pediculose",
+    "category": "Dermatológicas",
+    "symptoms": ["Prurido intenso no couro cabeludo", "Excoreações", "Linfadenopatia cervical", "Visualização de lêndeas"],
+    "medications": ["Permetrina", "Ivermectina"],
+    "description_pro": "Infestação parasitária do couro cabeludo pelo Pediculus humanus capitis.",
+    "description_plain": "Infestação por piolhos que causa muita coceira na cabeça."
+  },
+  {
+    "name": "Escabiose",
+    "category": "Dermatológicas",
+    "symptoms": ["Prurido noturno", "Pápulas eritematosas", "Sulcos lineares", "Lesões interdigitais"],
+    "medications": ["Permetrina", "Ivermectina"],
+    "description_pro": "Infestação cutânea pelo ácaro Sarcoptes scabiei.",
+    "description_plain": "Sarna. Coceira intensa que piora à noite, especialmente entre os dedos."
+  },
+  {
+    "name": "Sinusite Aguda (Rinossinusite)",
+    "category": "Otorrinolaringológicas",
+    "symptoms": ["Pressão facial", "Obstrução nasal", "Rinorreia purulenta", "Hiposmia", "Cefaleia frontal"],
+    "medications": ["Amoxicilina + Clavulanato", "Loratadina"],
+    "description_pro": "Inflamação da mucosa dos seios paranasais, geralmente após infecção viral.",
+    "description_plain": "Inflamação no rosto que causa dor, nariz entupido e catarro amarelo/verde."
+  },
+  {
+    "name": "Depressão Maior",
+    "category": "Psiquiátricas",
+    "symptoms": ["Anedonia", "Humor deprimido", "Insônia ou Hipersonia", "Ideação suicida", "Retardo psicomotor"],
+    "medications": ["Sertralina", "Fluoxetina", "Amitriptilina"],
+    "description_pro": "Transtorno do humor caracterizado por tristeza persistente e perda de interesse.",
+    "description_plain": "Tristeza profunda, falta de ânimo para tudo e alterações no sono."
+  },
+  {
+    "name": "Transtorno de Ansiedade Generalizada (TAG)",
+    "category": "Psiquiátricas",
+    "symptoms": ["Hipervigilância", "Tensão muscular", "Palpitações", "Irritabilidade", "Dificuldade de concentração"],
+    "medications": ["Escitalopram", "Buspirona"],
+    "description_pro": "Preocupação excessiva e persistente associada a sintomas somáticos de hiperatividade autonômica.",
+    "description_plain": "Ansiedade constante, preocupação exagerada e batimentos cardíacos acelerados."
+  },
+  {
+    "name": "Esquistossomose",
+    "category": "Infecciosas",
+    "symptoms": ["Hepatometalagia", "Esplenomegalia", "Ascite", "Varizes esofágicas", "Dermatite cercariana"],
+    "medications": ["Praziquantel"],
+    "description_pro": "Parasitose causada por Schistosoma mansoni, com fase crônica evoluindo para hipertensão portal.",
+    "description_plain": "Doença do caramujo. Causa barriga d'água e aumento do fígado e baço."
+  },
+  {
+    "name": "Hanseníase",
+    "category": "Infecciosas",
+    "symptoms": ["Manchas hipocrômicas", "Anestesia térmica e dolorosa", "Espessamento neural", "Parestesia", "Madarose"],
+    "medications": ["Rifampicina", "Dapsona"],
+    "description_pro": "Doença infectocontagiosa crônica causada pelo Mycobacterium leprae, com tropismo por nervos periféricos.",
+    "description_plain": "Doença que causa manchas na pele com perda de sensibilidade ao calor e à dor."
+  },
+  {
+    "name": "Otite Média Aguda",
+    "category": "Otorrinolaringológicas",
+    "symptoms": ["Otalgia intensa", "Otorreia", "Hipoacusia", "Membrana timpânica hiperemiada", "Pirexia"],
+    "medications": ["Amoxicilina"],
+    "description_pro": "Infecção bacteriana ou viral da orelha média, comum em crianças após IVAS.",
+    "description_plain": "Dor de ouvido forte, febre e às vezes saída de secreção."
+  },
+  {
+    "name": "Gota (Artrite Gotosa)",
+    "category": "Reumatológicas",
+    "symptoms": ["Podagra", "Hiperuricemia", "Tofos gotosos", "Eritema articular", "Calor local"],
+    "medications": ["Alopurinol", "Colchicina"],
+    "description_pro": "Artrite inflamatória por deposição de cristais de urato monossódico nas articulações.",
+    "description_plain": "Aumento do ácido úrico que causa dor insuportável no dedão do pé e outras juntas."
+  },
+  {
+    "name": "Psoríase",
+    "category": "Dermatológicas",
+    "symptoms": ["Placas eritemato-escamosas", "Sinal de Auspitz", "Unhas em 'dedal'", "Prurido leve", "Escamas prateadas"],
+    "medications": ["Corticosteroides tópicos", "Metotrexato"],
+    "description_pro": "Doença inflamatória cutânea imunomediada com hiperproliferação de queratinócitos.",
+    "description_plain": "Doença na pele que causa manchas vermelhas que descamam, comuns em cotovelos e joelhos."
+  }
+]
