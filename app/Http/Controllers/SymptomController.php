@@ -62,4 +62,41 @@ class SymptomController extends Controller
     {
         //
     }
+
+    /**
+     * Search symptoms with descriptions for the welcome page modal.
+     */
+    public function searchSymptoms(Request $request)
+    {
+        $query = $request->input('query', '');
+
+        $symptoms = Symptom::with('descriptions')
+            ->when($query, function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%");
+            })
+            ->orderBy('name')
+            ->limit(10)
+            ->get()
+            ->map(function ($symptom) {
+                // Mapear severidade para português
+                $severityMap = [
+                    'low' => 'leve',
+                    'medium' => 'moderado',
+                    'high' => 'grave'
+                ];
+                
+                $severityPt = $severityMap[$symptom->severity] ?? $symptom->severity;
+
+                return [
+                    'id' => $symptom->id,
+                    'name' => $symptom->name,
+                    'severity' => $severityPt,
+                    'description' => $symptom->descriptions->first()?->content ?? 'Sem descrição disponível.',
+                ];
+            });
+
+        return response()->json([
+            'symptoms' => $symptoms
+        ]);
+    }
 }

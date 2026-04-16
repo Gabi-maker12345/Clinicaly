@@ -1,3 +1,12 @@
+/* 
+   Removido o seletor universal * com !important, pois ele impedia o 
+   FontAwesome de carregar sua própria fonte de ícones.
+*/
+
+body {
+    font-family: 'Dosis', sans-serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

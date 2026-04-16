@@ -1,125 +1,128 @@
 <x-app-layout>
-    <link rel="stylesheet" href="{{ asset('css/clinicaly.css') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<main class="page">
+    <style>
+    .page{max-width:900px;margin:0 auto;padding:28px 20px 80px;}
+    @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fi{animation:fi .3s ease both;}.fi1{animation-delay:.05s;}.fi2{animation-delay:.1s;}.fi3{animation-delay:.15s;}
+    .act-card{transition:all .2s;}.act-card:hover{border-color:var(--in);box-shadow:var(--sh2);transform:translateY(-2px);}
+    </style>
 
-    <div class="min-h-screen pb-20">
-        
-        <div class="sticky top-0 z-50 px-4 pt-4">
-            <nav x-data="{ open: false }" class="floating-nav max-w-10xl mx-auto rounded-[24px] px-6 h-16 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <img src="{{ asset('Proosta-logo4.png') }}" alt="Logo" width="180px" class="w-32 md:w-44">
-                </div>
+    <section class="fi" aria-labelledby="pg-h">
+        <h1 id="pg-h" style="font-size:1.7rem;font-weight:800;margin-bottom:4px;">Olá, <span style="background:linear-gradient(135deg,var(--in),var(--il));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{{ explode(' ', $user->name)[0] }}</span></h1>
+        <p style="font-family:'Space Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--mu);">O que quer fazer hoje?</p>
+    </section>
 
-                <div class="relative flex items-center gap-3">
-                    <div class="hidden sm:block text-right">
-                        <p class="text-[13px] font-bold text-slate-900 leading-none">{{ Auth::user()->name }}</p>
-                        <p class="text-[9px] font-black text-[#6d55b1] uppercase tracking-[0.15em] mt-1">Conta Paciente</p>
-                    </div>
-
-                    <button @click="open = !open" @click.away="open = false" class="focus:outline-none group">
-                        <div class="h-10 w-10 rounded-xl border-[3px] border-white shadow-sm overflow-hidden group-hover:border-indigo-50 transition-all">
-                            <img src="{{ Auth::user()->profile_photo_url }}" class="w-full h-full object-cover">
-                        </div>
-                    </button>
-
-                    <div x-show="open" x-cloak
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 translate-y-2 scale-95"
-                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                         class="absolute right-0 top-14 w-56 rounded-[22px] dropdown-glass py-2 overflow-hidden shadow-2xl">
-                        
-                        <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-[#6d55b1]/5 hover:text-[#6d55b1] transition-all">
-                            <i class="fa-regular fa-user-circle text-lg opacity-50"></i> Ver Perfil
-                        </a>
-
-                        <form method="POST" action="{{ route('logout') }}" x-data>
-                            @csrf
-                            <button type="submit" @click.prevent="$root.submit();" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-rose-500 hover:bg-rose-50 transition-all text-left">
-                                <i class="fa-solid fa-arrow-right-from-bracket text-lg opacity-50"></i> Sair
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </nav>
+    @if($stats['pendentes'] > 0)
+    <section class="fi fi1" style="margin-top:14px;" aria-label="Resumo rápido">
+        <div role="status" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--rs);font-size:.84rem;font-weight:500;border:1px solid;background:var(--rb);border-color:var(--rbd);color:var(--rd);">
+            <i class="fa-solid fa-hourglass-half" aria-hidden="true" style="flex-shrink:0;"></i>
+            <p><strong>{{ $stats['pendentes'] }} diagnóstico{{ $stats['pendentes'] != 1 ? 's' : '' }}</strong> a aguardar validação médica</p>
+            <a href="{{ route('discovery.index') }}" style="margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:30px;border:none;font-family:'Dosis',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;text-decoration:none;background:transparent;color:var(--rd);border:1.5px solid var(--rbd);">Ver</a>
         </div>
+    </section>
+    @endif
 
-        <main class="mt-12 max-w-5xl mx-auto px-6">
-            <header class="mb-10">
-                <h1 class="text-3xl font-light text-slate-900">Olá, <span class="font-black text-[#6d55b1]">{{ Auth::user()->name }}</span></h1>
-                <p class="text-slate-400 font-medium">O que deseja priorizar hoje?</p>
-            </header>
+    <nav class="fi fi2" style="margin-top:20px;" aria-label="Actividades principais">
+        <ul style="list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <div class="md:col-span-2 lg:col-span-2 rounded-[35px] p-10 bg-[#6d55b1] text-white shadow-2xl shadow-indigo-200 card-hover card-clickable relative overflow-hidden group">
-                    <div class="relative z-10">
-                        <div class="bg-white/10 w-14 h-14 rounded-2xl flex items-center justify-center mb-8 backdrop-blur-md border border-white/20">
-                            <i class="fa-solid fa-stethoscope text-2xl"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold mb-3">Diagnóstico Rápido</h2>
-                        <p class="text-indigo-100/90 text-sm leading-relaxed max-w-xs">Avalie seus sintomas em poucos minutos com nossa triagem inteligente.</p>
-                    </div>
-                    <div class="mt-10 inline-flex bg-white text-[#6d55b1] font-bold py-3 px-8 rounded-2xl text-xs uppercase tracking-widest self-start transition-transform group-hover:scale-105">
-                        <a href="{{ route ('discovery.index') }}" class=" text-decoration-none">
-                            Iniciar Avaliação
-                        </a>
-                    </div>
-                    <i class="fa-solid fa-wave-square absolute -right-10 -bottom-10 text-[15rem] text-white/5 rotate-12"></i>
-                </div>
-
-                <a href="{{ route('chat.index') }}" class="bg-white rounded-[35px] p-8 text-center border border-slate-100 shadow-sm card-hover card-clickable flex flex-col items-center justify-center transition-all">
-                    <div class="bg-blue-50 text-blue-500 w-16 h-16 rounded-[24px] flex items-center justify-center mb-4">
-                        <i class="fa-solid fa-robot text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-slate-800 text-lg">Chat Medicinal</h3>
-                    <p class="text-xs text-slate-400 mt-2 font-medium">Dúvidas rápidas com nossa IA especializada.</p>
-                </a>
-
-                <div class="bg-white rounded-[35px] p-8 flex flex-col items-center justify-center text-center border border-slate-100 shadow-sm card-hover card-clickable">
-                    <div class="bg-purple-50 text-purple-600 w-16 h-16 rounded-[24px] flex items-center justify-center mb-4">
-                        <i class="fa-solid fa-layer-group text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-slate-800 text-lg">Flashcards</h3>
-                    <p class="text-xs text-slate-400 mt-2 font-medium">Revise termos e conceitos médicos.</p>
-                </div>
-
-                <div class="md:col-span-2 bg-white rounded-[35px] p-10 overflow-hidden relative group border border-slate-100 shadow-sm card-hover card-clickable">
-                    <div class="relative z-10">
-                        <h2 class="text-xl font-bold text-slate-800 mb-2 tracking-tight">Enciclopédia Médica</h2>
-                        <p class="text-slate-500 text-sm max-w-xs leading-relaxed">Busque em milhares de doenças, sintomas e categorias (CID-11 & ANVISA).</p>
-                        <div class="mt-8 flex gap-3">
-                            <span class="px-5 py-2 bg-slate-50 rounded-xl text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-100">CID-11</span>
-                            <span class="px-5 py-2 bg-slate-50 rounded-xl text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-100">ANVISA</span>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-book-medical absolute -right-4 -bottom-4 text-[10rem] text-slate-50 group-hover:text-slate-100/80 transition-colors"></i>
-                </div>
-
-                <div class="md:col-span-1 lg:col-span-2 bg-white rounded-[35px] p-10 flex flex-col md:flex-row gap-8 items-center border border-slate-100 shadow-sm card-hover card-clickable">
-                    <div class="bg-orange-50 text-orange-600 p-7 rounded-[28px] shadow-inner">
-                        <i class="fa-solid fa-file-prescription text-4xl"></i>
-                    </div>
+            <li>
+                <a href="{{ route('chat.index') }}" class="act-card" style="display:flex;align-items:center;gap:16px;padding:22px;background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);text-decoration:none;" aria-label="Chat IA">
+                    <span style="width:52px;height:52px;border-radius:14px;background:var(--bb);border:2px solid var(--bbd);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-robot" style="font-size:1.3rem;color:var(--bl);" aria-hidden="true"></i>
+                    </span>
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Minhas Receitas</h2>
-                        <p class="text-sm text-slate-500 font-medium leading-relaxed">Acompanhamento e nuances do seu tratamento atual.</p>
-                        <div class="mt-4 text-orange-600 font-black text-xs uppercase tracking-widest">Ver detalhes →</div>
+                        <p style="font-weight:800;font-size:1rem;color:var(--tx);">Chat IA</p>
+                        <p style="font-size:.78rem;color:var(--mu);margin-top:2px;">Conversa livre com o assistente médico</p>
                     </div>
-                </div>
+                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--mu);font-size:.85rem;" aria-hidden="true"></i>
+                </a>
+            </li>
 
-                <div class="bg-slate-900 rounded-[35px] p-8 text-white border-none flex flex-col justify-between shadow-2xl shadow-slate-200 card-hover card-clickable">
-                    <div class="flex justify-between items-start">
-                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
-                            <i class="fa-solid fa-bell text-xl text-emerald-400"></i>
-                        </div>
-                        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-full font-black uppercase tracking-widest">2 ativos</span>
+            <li>
+                <a href="{{ route('discovery.index') }}" class="act-card" style="display:flex;align-items:center;gap:16px;padding:22px;background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);text-decoration:none;" aria-label="Dicionário de Saúde">
+                    <span style="width:52px;height:52px;border-radius:14px;background:var(--gb);border:2px solid var(--gbd);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-book-medical" style="font-size:1.3rem;color:var(--gr);" aria-hidden="true"></i>
+                    </span>
+                    <div>
+                        <p style="font-weight:800;font-size:1rem;color:var(--tx);">Dicionário de Saúde</p>
+                        <p style="font-size:.78rem;color:var(--mu);margin-top:2px;">Doenças, sintomas e fontes médicas</p>
                     </div>
-                    <div class="mt-8">
-                        <h3 class="font-bold text-xl leading-none tracking-tight">Lembretes</h3>
-                        <p class="text-xs text-slate-400 mt-2 font-medium">Próxima dose em 45min.</p>
-                    </div>
-                </div>
+                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--mu);font-size:.85rem;" aria-hidden="true"></i>
+                </a>
+            </li>
 
-            </div>
-        </main>
-    </div>
+            <li>
+                <a href="{{ route('profile.show') }}" class="act-card" style="display:flex;align-items:center;gap:16px;padding:22px;background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);text-decoration:none;position:relative;" aria-label="Meus Diagnósticos">
+                    <span style="width:52px;height:52px;border-radius:14px;background:var(--is);border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">
+                        <i class="fa-solid fa-stethoscope" style="font-size:1.3rem;color:var(--in);" aria-hidden="true"></i>
+                        @if($stats['pendentes'] > 0)
+                        <span style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--rd);color:#fff;font-size:.55rem;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--sf);">{{ $stats['pendentes'] }}</span>
+                        @endif
+                    </span>
+                    <div>
+                        <p style="font-weight:800;font-size:1rem;color:var(--tx);">Meus Diagnósticos</p>
+                        <p style="font-size:.78rem;color:var(--mu);margin-top:2px;">Histórico e resultados dos diagnósticos</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--mu);font-size:.85rem;" aria-hidden="true"></i>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('profile.show') }}" class="act-card" style="display:flex;align-items:center;gap:16px;padding:22px;background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);text-decoration:none;" aria-label="Minhas Prescrições">
+                    <span style="width:52px;height:52px;border-radius:14px;background:var(--wb);border:2px solid var(--wbd);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-file-medical" style="font-size:1.3rem;color:var(--wn);" aria-hidden="true"></i>
+                    </span>
+                    <div>
+                        <p style="font-weight:800;font-size:1rem;color:var(--tx);">Minhas Prescrições</p>
+                        <p style="font-size:.78rem;color:var(--mu);margin-top:2px;">Medicamentos e histórico de receitas</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--mu);font-size:.85rem;" aria-hidden="true"></i>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('messages.index') }}" class="act-card" style="display:flex;align-items:center;gap:16px;padding:22px;background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);text-decoration:none;" aria-label="Minhas Mensagens">
+                    <span style="width:52px;height:52px;border-radius:14px;background:var(--rb);border:2px solid var(--rbd);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-comment-dots" style="font-size:1.3rem;color:var(--rd);" aria-hidden="true"></i>
+                    </span>
+                    <div>
+                        <p style="font-weight:800;font-size:1rem;color:var(--tx);">Minhas Mensagens</p>
+                        <p style="font-size:.78rem;color:var(--mu);margin-top:2px;">Conversas com seu médico</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--mu);font-size:.85rem;" aria-hidden="true"></i>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('profile.show') }}" class="act-card" style="display:flex;align-items:center;gap:16px;padding:22px;background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);text-decoration:none;" aria-label="Meu Perfil">
+                    <span style="width:52px;height:52px;border-radius:14px;background:var(--bb);border:2px solid var(--bbd);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fa-solid fa-user-gear" style="font-size:1.3rem;color:var(--bl);" aria-hidden="true"></i>
+                    </span>
+                    <div>
+                        <p style="font-weight:800;font-size:1rem;color:var(--tx);">Meu Perfil</p>
+                        <p style="font-size:.78rem;color:var(--mu);margin-top:2px;">Dados pessoais e configurações</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;color:var(--mu);font-size:.85rem;" aria-hidden="true"></i>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+
+</main>
+
+<script>
+    document.querySelectorAll('.act-card').forEach(c => {
+        c.addEventListener('mouseenter', () => {
+            c.style.borderColor = 'var(--in)';
+            c.style.boxShadow = 'var(--sh2)';
+            c.style.transform = 'translateY(-2px)';
+        });
+        c.addEventListener('mouseleave', () => {
+            c.style.borderColor = 'var(--bd)';
+            c.style.boxShadow = 'var(--sh)';
+            c.style.transform = '';
+        });
+    });
+</script>
 </x-app-layout>

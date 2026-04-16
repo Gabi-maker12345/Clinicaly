@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Disease extends Model
 {
-    protected $fillable = ['name', 'icd_code', 'category_id',];
+    protected $fillable = ['name', 'icd_code', 'category_id', 'severity',];
 
     public function categories()
     {

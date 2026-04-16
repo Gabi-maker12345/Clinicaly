@@ -67,10 +67,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function monitorings() {
-        return $this->hasMany(Monitoring::class);
-    }
-
     public function searchHistories() {
         return $this->hasMany(SearchHistory::class);
     }
@@ -82,5 +78,9 @@ class User extends Authenticatable
     public function chatSessions()
     {
         return $this->hasMany(ChatSession::class);
+    }
+
+    public function conversations() {
+        return $this->hasMany(Conversation::class, 'sender_id')->orWhere('receiver_id', $this->id);
     }
 }

@@ -11,24 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
+               
+        Schema::create('prescriptions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('diagnostico_id')->constrained()->onDelete('cascade');
+            $table->date('start_date');
+            $table->date('finish_date');
+            $table->text('recommendations')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('monitorings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('disease_id')->constrained();
-
-            $table->foreignId('medication_id')->nullable()->constrained();
-            
-            $table->date('start_date');
-            $table->date('finish_date')->nullable(); 
-            
-            // Intervalo em horas (8 para "8 em 8 horas")
-            $table->integer('interval_hours')->nullable(); 
-            
-            // Próxima notificação (crucial para o sistema saber quando avisar o user)
+            $table->foreignId('prescription_id')->constrained()->onDelete('cascade');
+            $table->string('medication_name');
+            $table->integer('interval_hours');
             $table->dateTime('next_notification_at')->nullable();
-            
-            $table->enum('status', ['active', 'completed', 'paused'])->default('active');
-            $table->text('notes')->nullable();
+            $table->enum('status', ['pending', 'active', 'completed'])->default('pending');
             $table->timestamps();
         });
     }
@@ -38,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('monitorings');
+        Schema::dropIfExists('monitorings, prescriptions');
     }
 };

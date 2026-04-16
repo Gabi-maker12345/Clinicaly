@@ -43,7 +43,7 @@ class ChatController extends Controller
         }
 
         \App\Models\ChatLog::create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'role' => 'assistant',
             'message' => $botResponse
         ]);
