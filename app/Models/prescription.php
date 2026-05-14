@@ -15,7 +15,7 @@ class Prescription extends Model
         'finish_date' => 'date',
     ];
 
-    protected $with = ['diagnostico', 'monitorings'];
+    protected $with = ['diagnostico', 'monitorings.intakeLogs'];
     protected $appends = [];
 
     public function diagnostico(): BelongsTo

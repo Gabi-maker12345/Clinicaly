@@ -5,10 +5,23 @@ use App\Models\Prescription;
 use App\Models\Monitoring;
 use App\Models\Diagnostico;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class PrescriptionController extends Controller
 {
+    public function indexMedico()
+    {
+        $prescriptions = Prescription::with(['diagnostico.paciente', 'monitorings'])
+            ->whereHas('diagnostico', function ($query) {
+                $query->where('id_medico', Auth::id());
+            })
+            ->latest()
+            ->get();
+
+        return view('prescricoes.index_medico', compact('prescriptions'));
+    }
+
     public function create(Diagnostico $diagnostico)
     {
         $diagnostico->load(['paciente', 'medico']); 
@@ -26,7 +39,6 @@ class PrescriptionController extends Controller
             'medications.*.duration' => 'required|integer|min:1',
         ]);
 
-        // 1. Cálculo da Data Final baseado no remédio com maior duração
         $startDate = Carbon::parse($request->start_date);
         $maxDurationDays = 0;
 
@@ -38,7 +50,6 @@ class PrescriptionController extends Controller
 
         $finishDate = $startDate->copy()->addDays((int) $maxDurationDays);
 
-        // 2. Criar a Prescrição (Capa)
         $prescription = Prescription::create([
             'diagnostico_id' => $diagnostico->id,
             'start_date' => $startDate,
@@ -46,29 +57,25 @@ class PrescriptionController extends Controller
             'recommendations' => $request->recommendations,
         ]);
 
-        // 3. Salvar os Medicamentos (Monitoramentos Individuais)
         foreach ($request->medications as $med) {
             Monitoring::create([
                 'prescription_id' => $prescription->id,
                 'medication_name' => $med['name'],
                 'interval_hours' => $med['interval'],
+                'duration_days' => $med['duration'],
                 'status' => 'pending'
             ]);
         }
 
-        // 4. Validar o Diagnóstico
         $diagnostico->update(['status' => 'validado']);
 
-        // Retorna para a dashboard ou lista de pacientes
         return redirect()->route('dashboard')->with('success', 'Prescrição emitida e diagnóstico validado!');
     }
 
-    // Método para simular o banco de remédios na barra flutuante
     public function searchMedications(Request $request)
     {
         $query = strtolower($request->get('q', ''));
-        
-        // Exemplo de banco de dados mockado. Você pode trocar por um DB real: Medication::where('name', 'like', "%$query%")->get()
+
         $db = [
             'Amoxicilina 500mg', 'Ibuprofeno 400mg', 'Dipirona 1g', 'Paracetamol 750mg',
             'Ceftriaxona 2g IV', 'Dexametasona 0.15 mg/kg IV', 'Azitromicina 500mg', 'Omeprazol 20mg'

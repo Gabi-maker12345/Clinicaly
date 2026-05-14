@@ -8,8 +8,13 @@
         article { animation: fadeInUp 0.45s ease-out; }
     </style>
     <style>
-        .page { max-width: 900px; margin: 0 auto; padding: 28px 20px; }
-        .ph { display: flex; align-items: center; gap: 20px; padding: 24px; background: var(--sf); border: 1px solid var(--bd); border-radius: var(--r); box-shadow: var(--sh); margin-bottom: 14px; }
+        .page { width:100%; max-width:none; margin:0; padding:32px 36px 80px; }
+        .history-shell{width:min(1280px,100%);margin:0 auto}
+        .history-grid{display:grid;grid-template-columns:minmax(280px,.34fr) minmax(0,1fr);gap:18px;align-items:start}
+        .ph { display: flex; flex-direction:column; align-items:stretch; gap: 18px; padding: 22px; background: var(--sf); border: 1px solid var(--bd); border-radius: var(--r); box-shadow: var(--sh); margin-bottom: 14px; overflow:hidden; }
+        .profile-row{display:flex;align-items:center;gap:14px;min-width:0}
+        .profile-row .flex-1{min-width:0}
+        .profile-row h2,.profile-row p{overflow-wrap:anywhere}
         .av-lg { width: 68px; height: 68px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; }
         .tg { display: inline-flex; align-items: center; gap: 4px; font-size: .7rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
         .sc { border-radius: var(--r); padding: 18px 20px; background: var(--sf); border: 1px solid var(--bd); }
@@ -24,9 +29,11 @@
         .b-gr { background: var(--gb); color: var(--gr); border: 1.5px solid var(--gbd); }
         .b-gh { background: transparent; border: 1px solid var(--bd); color: var(--mu); }
         .bsm { padding: 4px 12px; font-size: .75rem; }
+        @media(max-width:980px){.page{padding:24px 16px 60px}.history-grid{grid-template-columns:1fr}}
     </style>
 
     <div class="page">
+    <div class="history-shell">
         <section class="mb-6">
             <header class="flex items-center justify-between">
                 <div>
@@ -36,35 +43,40 @@
             </header>
         </section>
 
-        <article class="ph">
-            <div class="av-lg bg-indigo-100 text-indigo-600 border-2 border-indigo-200">
-                {{ substr($patient->name, 0, 2) }}
-            </div>
-            <div class="flex-1">
-                <h2 class="text-xl font-bold" style="color: var(--tx);">{{ $patient->name }}</h2>
-                <p class="text-xs font-mono uppercase tracking-tighter" style="color: var(--mu);">ID: {{ $patient->id }} · {{ $patient->email }}</p>
-                <div class="flex gap-2 mt-3">
-                    <span class="tg border-blue-200 text-blue-600 bg-blue-50">{{ $stats['total_diagnostics'] }} Diagnósticos</span>
-                    <span class="tg border-emerald-200 text-emerald-600 bg-emerald-50">Adesão {{ $stats['adherence_rate'] }}%</span>
+        <div class="history-grid">
+        <aside>
+            <article class="ph">
+                <div class="profile-row">
+                    <div class="av-lg bg-indigo-100 text-indigo-600 border-2 border-indigo-200">
+                        {{ substr($patient->name, 0, 2) }}
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl font-bold" style="color: var(--tx);">{{ $patient->name }}</h2>
+                        <p class="text-xs font-mono uppercase tracking-tighter" style="color: var(--mu);">ID: {{ $patient->id }} · {{ $patient->email }}</p>
+                        <div class="flex gap-2 mt-3 flex-wrap">
+                            <span class="tg border-blue-200 text-blue-600 bg-blue-50">{{ $stats['total_diagnostics'] }} Diagnósticos</span>
+                            <span class="tg border-emerald-200 text-emerald-600 bg-emerald-50">Adesão {{ $stats['adherence_rate'] }}%</span>
+                        </div>
+                    </div>
                 </div>
+                <nav class="flex flex-col gap-2 items-stretch w-full">
+                    <form action="{{ route('messages.start', $patient->id) }}" method="POST" style="display: inline;">
+                        @csrf
+                        <button type="submit" class="btn b-gh bsm w-full">
+                            <i class="fa-solid fa-message"></i> Chat
+                        </button>
+                    </form>
+                </nav>
+            </article>
+
+            <div class="grid grid-cols-1 gap-3 mb-6">
+                <article class="sc"><p class="v text-blue-600">{{ $stats['total_diagnostics'] }}</p><p class="text-xs text-gray-500 font-bold uppercase">Diagnósticos</p></article>
+                <article class="sc"><p class="v text-emerald-600">{{ $stats['total_prescriptions'] }}</p><p class="text-xs text-gray-500 font-bold uppercase">Prescrições</p></article>
+                <article class="sc"><p class="v text-purple-600">{{ $stats['adherence_rate'] }}%</p><p class="text-xs text-gray-500 font-bold uppercase">Adesão</p></article>
             </div>
-            <nav class="flex flex-col gap-2 items-end">
-                <form action="{{ route('messages.start', $patient->id) }}" method="POST" style="display: inline;">
-                    @csrf
-                    <button type="submit" class="btn b-gh bsm w-full">
-                        <i class="fa-solid fa-message"></i> Chat
-                    </button>
-                </form>
-            </nav>
-        </article>
+        </aside>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-            <article class="sc"><p class="v text-blue-600">{{ $stats['total_diagnostics'] }}</p><p class="text-xs text-gray-500 font-bold uppercase">Diagnósticos</p></article>
-            <article class="sc"><p class="v text-emerald-600">{{ $stats['total_prescriptions'] }}</p><p class="text-xs text-gray-500 font-bold uppercase">Prescrições</p></article>
-            <article class="sc"><p class="v text-purple-600">{{ $stats['adherence_rate'] }}%</p><p class="text-xs text-gray-500 font-bold uppercase">Adesão</p></article>
-        </div>
-
-        <article style="background: var(--sf); border: 1px solid var(--bd);" class="rounded-2xl p-6 shadow-sm">
+        <article style="background: var(--sf); border: 1px solid var(--bd); min-height:620px;" class="rounded-2xl p-6 shadow-sm">
             <h2 class="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest pb-4 mb-6" style="color: var(--mu); border-bottom: 1px solid var(--bd);">
                 <i class="fa-solid fa-timeline"></i> Linha do Tempo Clínica
             </h2>
@@ -117,5 +129,7 @@
                 @endforelse
             </ol>
         </article>
+        </div>
+    </div>
     </div>
 </x-app-layout>

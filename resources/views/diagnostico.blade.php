@@ -45,9 +45,74 @@
         }
         .pulse-item { animation: pulse-glow 2s infinite; }
         .search-highlight { background: var(--is); border-left: 3px solid var(--in); }
+        .symptom-option.selected{background:var(--in)!important;color:#fff!important;border-color:var(--il)!important;box-shadow:0 6px 16px rgba(109,85,177,.22);}
+        .std-modal-overlay{display:none;position:fixed;inset:0;z-index:120;background:rgba(10,8,20,.55);backdrop-filter:blur(2px);align-items:center;justify-content:center;padding:20px}
+        .std-modal-overlay.open{display:flex}.std-modal{width:min(430px,100%);background:var(--sf);border:1px solid var(--bd);border-radius:22px;box-shadow:var(--sh2);padding:24px}.std-modal h2{font-size:1.08rem;font-weight:800;color:var(--tx);margin-bottom:8px}.std-modal p{color:var(--mu);font-weight:600;line-height:1.5}.std-actions{display:flex;justify-content:flex-end;margin-top:18px}
+        .info-modal-overlay{display:none;position:fixed;inset:0;z-index:130;background:rgba(10,8,20,.62);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
+        .info-modal-overlay.open{display:flex}
+        .info-modal{width:min(680px,100%);max-height:min(86vh,760px);overflow-y:auto;background:var(--sf);border:1px solid var(--bd);border-radius:28px;box-shadow:0 24px 70px rgba(0,0,0,.28);padding:28px;color:var(--tx)}
+        .info-modal::-webkit-scrollbar{width:4px}.info-modal::-webkit-scrollbar-thumb{background:var(--bd);border-radius:999px}
+        .info-modal-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px}
+        .info-modal-icon{width:52px;height:52px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:var(--is);color:var(--in);font-size:1.1rem;flex:0 0 auto}
+        .info-modal h2{font-size:1.55rem;font-weight:900;line-height:1.05;margin:0 0 6px}
+        .info-modal-kind{font:800 .55rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--in)}
+        .info-modal-desc{color:var(--mu);font-size:1rem;font-weight:650;line-height:1.65;margin:14px 0 18px}
+        .info-close{width:38px;height:38px;border:none;border-radius:13px;background:var(--sf2);color:var(--mu);font-weight:900}
+        .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:18px 0}
+        .info-kv{background:var(--sf2);border:1px solid var(--bd);border-radius:16px;padding:12px}
+        .info-kv span{display:block;color:var(--mu);font:800 .54rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+        .info-kv strong{font-size:.92rem;color:var(--tx)}
+        .info-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+        .info-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);border-radius:999px;padding:7px 11px;font-weight:800;font-size:.78rem}
+        .info-small-btn{border:1px solid var(--bd);background:var(--sf2);color:var(--in);border-radius:999px;padding:8px 12px;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
         .al { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--rs); font-size: 0.84rem; font-weight: 500; border: 1px solid; }
         .al-rd { background: var(--rb); border-color: var(--rbd); color: var(--rd); }
         .al-wn { background: var(--wb); border-color: var(--wbd); color: var(--wn); }
+        #section-diagnostico form{max-width:820px!important}
+        #section-diagnostico form>div{border-radius:22px!important;padding:24px!important;box-shadow:var(--sh)!important}
+        #section-diagnostico label{font-family:'Space Mono',monospace!important;font-size:.58rem!important;letter-spacing:.1em!important;color:var(--mu)!important}
+        #section-diagnostico input,
+        #section-diagnostico select,
+        #section-diagnostico textarea{
+            min-height:46px!important;
+            width:100%!important;
+            border:1.5px solid var(--bd)!important;
+            border-radius:12px!important;
+            background:var(--sf2)!important;
+            color:var(--tx)!important;
+            padding:11px 14px!important;
+            font:700 .92rem 'Dosis',sans-serif!important;
+            outline:none!important;
+            box-shadow:none!important;
+            transition:border-color .18s,box-shadow .18s,background .18s!important;
+        }
+        #section-diagnostico input:focus,
+        #section-diagnostico select:focus,
+        #section-diagnostico textarea:focus{
+            border-color:var(--in)!important;
+            background:var(--sf)!important;
+            box-shadow:0 0 0 3px rgba(109,85,177,.13)!important;
+        }
+        #section-diagnostico input::placeholder{color:var(--mu)!important;opacity:.75}
+        #section-diagnostico input[type=number]{appearance:textfield!important;-moz-appearance:textfield!important}
+        #section-diagnostico input[type=number]::-webkit-outer-spin-button,
+        #section-diagnostico input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none!important;margin:0!important}
+        #patientResults,#symptomDropdown,#searchResults{
+            border:1px solid var(--bd)!important;
+            background:var(--sf)!important;
+            color:var(--tx)!important;
+            border-radius:14px!important;
+            box-shadow:var(--sh2)!important;
+            scrollbar-width:thin;
+            scrollbar-color:var(--bd) transparent;
+        }
+        #patientResults::-webkit-scrollbar,#symptomDropdown::-webkit-scrollbar,#searchResults::-webkit-scrollbar,#symptomList::-webkit-scrollbar{width:4px}
+        #patientResults::-webkit-scrollbar-track,#symptomDropdown::-webkit-scrollbar-track,#searchResults::-webkit-scrollbar-track,#symptomList::-webkit-scrollbar-track{background:transparent}
+        #patientResults::-webkit-scrollbar-thumb,#symptomDropdown::-webkit-scrollbar-thumb,#searchResults::-webkit-scrollbar-thumb,#symptomList::-webkit-scrollbar-thumb{background:var(--bd);border-radius:999px}
+        #symptomList{border-radius:16px!important;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+        #selectedSymptoms>div{border-radius:999px!important}
+        #section-diagnostico button[type="submit"]{border-radius:16px!important;box-shadow:0 10px 28px rgba(109,85,177,.22)!important}
+        @media(max-width:640px){#section-diagnostico form>div{padding:18px!important}#section-diagnostico .grid{grid-template-columns:1fr!important}}
         section { animation: fadeInUp 0.4s ease-out; }
         article { animation: fadeInUp 0.5s ease-out; }
         @keyframes fadeInUp { 
@@ -70,7 +135,7 @@
         </div>
 
         <nav id="nav-main" class="flex-1 space-y-2">
-            @if(Auth::user()->role === 'doctor')
+            @if(in_array(Auth::user()->role, ['doctor', 'medico', 'médico'], true))
             <button onclick="switchView('diagnostico')" style="color: var(--tx);"
                     class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl font-bold hover:bg-slate-100 transition-colors"
                     id="btn-diagnostico">
@@ -84,8 +149,13 @@
             </button>
             <button onclick="switchView('biblioteca_sintomas')" style="color: var(--tx);"
                     class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl font-bold hover:bg-slate-100 transition-colors"
-                    id="btn-biblioteca">
+                    id="btn-biblioteca_sintomas">
                 <i class="fa-solid fa-book-medical"></i> Lista de Sintomas
+            </button>
+            <button onclick="switchView('remedios')" style="color: var(--tx);"
+                    class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl font-bold hover:bg-slate-100 transition-colors"
+                    id="btn-remedios">
+                <i class="fa-solid fa-pills"></i> Remédios
             </button>
             <button onclick="switchView('categorias')" style="color: var(--tx);"
                     class="nav-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl font-bold hover:bg-slate-100 transition-colors"
@@ -128,21 +198,56 @@
             {{-- 1. BASE DE DOENÇAS --}}
             <section id="section-doencas">
                 <h2 style="color: var(--tx);" class="text-3xl font-black mb-8 uppercase tracking-tight">Doenças Registradas</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($diseases as $disease)
-                    <article id="disease-{{ $disease->id }}"
-                             style="background: var(--sf); border: 1px solid var(--bd); color: var(--tx);"
-                             class="p-6 rounded-[32px] hover:border-indigo-500 transition-all group shadow-sm">
-                        <div class="flex justify-between items-start mb-6">
-                            <div style="background: var(--is); color: var(--in);" class="p-4 rounded-2xl"><i class="fa-solid fa-virus"></i></div>
-                            <span style="background: var(--sf2); border: 1px solid var(--bd); color: var(--mu);" class="text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{{ $disease->category->name ?? 'Geral' }}</span>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2 group-hover:text-indigo-600 transition-colors">{{ $disease->name }}</h3>
-                        <p style="color: var(--mu);" class="text-sm mb-6 line-clamp-2">{{ $disease->description }}</p>
-                        <a href="{{ route('chat.index', ['prompt' => 'Forneça detalhes clínicos sobre: ' . $disease->name]) }}" 
-                           class="block text-center w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:shadow-lg hover:shadow-indigo-200 transition-all">Detalhes via IA</a>
-                    </article>
+                <div class="space-y-10">
+                    @foreach($categories as $category)
+                        @php
+                            $categoryDiseases = $diseases->filter(fn ($disease) => (int) ($disease->category_id ?? 0) === (int) $category->id || $disease->categories->contains('id', $category->id));
+                        @endphp
+                        @if($categoryDiseases->isNotEmpty())
+                            <div id="disease-category-{{ $category->id }}" class="disease-category-block">
+                                <div class="flex items-center justify-between gap-4 mb-4">
+                                    <h3 style="color: var(--tx);" class="text-xl font-black uppercase tracking-tight">{{ $category->name }}</h3>
+                                    <span style="background: var(--is); border: 1px solid var(--bd); color: var(--in);" class="text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{{ $categoryDiseases->count() }} doenças</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    @foreach($categoryDiseases as $disease)
+                                    <button type="button" id="disease-{{ $disease->id }}"
+                                             onclick="openInfoModal('disease', {{ $disease->id }})"
+                                             style="background: var(--sf); border: 1px solid var(--bd); color: var(--tx); text-align:left;"
+                                             class="p-6 rounded-[32px] hover:border-indigo-500 transition-all group shadow-sm">
+                                        <div class="flex justify-between items-start mb-6">
+                                            <div style="background: var(--is); color: var(--in);" class="p-4 rounded-2xl"><i class="fa-solid fa-virus"></i></div>
+                                            <span style="background: var(--sf2); border: 1px solid var(--bd); color: var(--mu);" class="text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{{ $category->name }}</span>
+                                        </div>
+                                        <h4 class="text-xl font-bold mb-2 group-hover:text-indigo-600 transition-colors">{{ $disease->name }}</h4>
+                                        <p style="color: var(--mu);" class="text-sm line-clamp-2">{{ $disease->brief_description }}</p>
+                                        <span style="color: var(--in);" class="mt-5 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">Ver informações <i class="fa-solid fa-arrow-right-long group-hover:translate-x-1 transition-transform"></i></span>
+                                    </button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     @endforeach
+
+                    @php $uncategorizedDiseases = $diseases->filter(fn ($disease) => empty($disease->category_id) && $disease->categories->isEmpty()); @endphp
+                    @if($uncategorizedDiseases->isNotEmpty())
+                        <div id="disease-category-geral" class="disease-category-block">
+                            <h3 style="color: var(--tx);" class="text-xl font-black uppercase tracking-tight mb-4">Geral</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                @foreach($uncategorizedDiseases as $disease)
+                                <button type="button" id="disease-{{ $disease->id }}" onclick="openInfoModal('disease', {{ $disease->id }})" style="background: var(--sf); border: 1px solid var(--bd); color: var(--tx); text-align:left;" class="p-6 rounded-[32px] hover:border-indigo-500 transition-all group shadow-sm">
+                                    <div class="flex justify-between items-start mb-6">
+                                        <div style="background: var(--is); color: var(--in);" class="p-4 rounded-2xl"><i class="fa-solid fa-virus"></i></div>
+                                        <span style="background: var(--sf2); border: 1px solid var(--bd); color: var(--mu);" class="text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Geral</span>
+                                    </div>
+                                    <h4 class="text-xl font-bold mb-2 group-hover:text-indigo-600 transition-colors">{{ $disease->name }}</h4>
+                                    <p style="color: var(--mu);" class="text-sm line-clamp-2">{{ $disease->brief_description }}</p>
+                                    <span style="color: var(--in);" class="mt-5 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">Ver informações <i class="fa-solid fa-arrow-right-long group-hover:translate-x-1 transition-transform"></i></span>
+                                </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </section>
 
@@ -154,20 +259,20 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     @forelse($symptoms as $symptom)
-                    <a id="symptom-{{ $symptom->id }}"
-                       href="{{ route('chat.index', ['prompt' => 'Análise clínica do sintoma: ' . $symptom->name]) }}" 
+                    <button type="button" id="symptom-{{ $symptom->id }}"
+                       onclick="openInfoModal('symptom', {{ $symptom->id }})"
                        style="background: var(--sf); border: 1px solid var(--bd); color: var(--tx);"
-                       class="relative overflow-hidden p-6 rounded-[24px] hover:scale-[1.02] hover:shadow-xl transition-all group">
+                       class="relative overflow-hidden p-6 rounded-[24px] hover:scale-[1.02] hover:shadow-xl transition-all group text-left">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
                             <span class="font-bold group-hover:text-indigo-600">{{ $symptom->name }}</span>
                         </div>
                         <div style="color: var(--mu);" class="text-[10px] font-black uppercase flex items-center gap-2">
-                            <span>Consultar Protocolo</span>
+                            <span>Ver informações</span>
                             <i class="fa-solid fa-arrow-right-long group-hover:translate-x-2 transition-transform"></i>
                         </div>
                         <i style="color: var(--sf2);" class="fa-solid fa-notes-medical absolute -bottom-4 -right-4 text-6xl group-hover:opacity-50 transition-opacity"></i>
-                    </a>
+                    </button>
                     @empty
                     <div style="background: var(--sf); border: 1px solid var(--bd); color: var(--mu);" class="p-8 rounded-[24px] col-span-full text-center">
                         <i class="fa-solid fa-inbox text-4xl mb-4"></i>
@@ -177,29 +282,42 @@
                 </div>
             </section>
 
-            {{-- 3. REALIZAR DIAGNÓSTICO --}}
+            {{-- 3. REMÉDIOS --}}
+            <section id="section-remedios" style="display: none;">
+                <div class="mb-10">
+                    <h2 style="color: var(--tx);" class="text-3xl font-black uppercase tracking-tight">Dicionário de Remédios</h2>
+                    <p style="color: var(--mu);" class="font-bold text-xs uppercase tracking-widest mt-1">Medicamentos cadastrados e suas principais informações clínicas</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    @forelse($medications as $medication)
+                    <button type="button"
+                            id="medication-{{ $medication->id }}"
+                            onclick="openInfoModal('medication', {{ $medication->id }})"
+                            style="background: var(--sf); border: 1px solid var(--bd); color: var(--tx); text-align:left;"
+                            class="p-6 rounded-[26px] hover:border-indigo-500 hover:shadow-xl transition-all group">
+                        <div class="flex items-start justify-between gap-4 mb-5">
+                            <div style="background: var(--is); color: var(--in);" class="w-12 h-12 flex items-center justify-center rounded-2xl"><i class="fa-solid fa-capsules"></i></div>
+                            <span style="background: var(--sf2); border: 1px solid var(--bd); color: var(--mu);" class="text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{{ $medication->diseases->count() }} usos</span>
+                        </div>
+                        <h4 class="text-lg font-black mb-1 group-hover:text-indigo-600">{{ $medication->name }}</h4>
+                        <p style="color: var(--mu);" class="text-xs font-bold uppercase tracking-widest mb-3">{{ $medication->active_principle ?? 'Princípio ativo não informado' }}</p>
+                        <p style="color: var(--mu);" class="text-sm line-clamp-2">{{ $medication->brief_description }}</p>
+                    </button>
+                    @empty
+                    <div style="background: var(--sf); border: 1px solid var(--bd); color: var(--mu);" class="p-8 rounded-[24px] col-span-full text-center">
+                        <i class="fa-solid fa-inbox text-4xl mb-4"></i>
+                        <p class="font-bold">Nenhum remédio disponível</p>
+                    </div>
+                    @endforelse
+                </div>
+            </section>
+
+            {{-- 4. REALIZAR DIAGNÓSTICO --}}
             <section id="section-diagnostico" style="display: none;">
                 <div class="max-w-3xl mx-auto text-center mb-10">
                     <h2 style="color: var(--tx);" class="text-3xl font-black uppercase tracking-tight">Realizar Diagnóstico</h2>
                     <p style="color: var(--mu);" class="mt-2 font-medium">Triagem automática baseada em perfis biométricos.</p>
                 </div>
-
-                <!-- Session error alert -->
-                @if($errors->any() || session('error'))
-                <div class="max-w-3xl mx-auto mb-6">
-                    <div class="al al-rd" style="margin-bottom: 0;">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        <div>
-                            <strong>Erro ao processar diagnóstico:</strong>
-                            @if(session('error'))
-                            <p>{{ session('error') }}</p>
-                            @else
-                            <p>{{ $errors->first() }}</p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                @endif
 
                 <form action="{{ route('processar.diagnostico') }}" method="POST" class="max-w-3xl mx-auto space-y-6">
                     @csrf
@@ -218,14 +336,6 @@
                                 </div>
                             </div>
                             <input type="hidden" id="patientId" name="id_paciente">
-                        </div>
-
-                        <!-- Error notification component -->
-                        <div id="formErrorNotification" style="display: none; margin-bottom: 16px;" class="al al-rd">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                            <div>
-                                <strong id="formErrorMessage">Erro ao processar diagnóstico</strong>
-                            </div>
                         </div>
 
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -279,9 +389,9 @@
 
                         <div id="symptomList" style="display: none; background: var(--is); border: 1px solid var(--bd);" class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-6 p-4 rounded-2xl max-h-48 overflow-y-auto">
                             @foreach($symptoms as $symptom)
-                            <button type="button" onclick="addSymptom({{ $symptom->id }}, '{{ $symptom->name }}')"
+                            <button type="button" data-symptom-option="{{ $symptom->id }}" onclick="addSymptom({{ $symptom->id }}, @js($symptom->name))"
                                     style="background: var(--sf); border: 1px solid var(--bd); color: var(--tx);"
-                                    class="text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors hover:border-indigo-500">
+                                    class="symptom-option text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors hover:border-indigo-500">
                                 + {{ $symptom->name }}
                             </button>
                             @endforeach
@@ -301,20 +411,29 @@
                 </form>
             </section>
 
-            {{-- 4. CATEGORIAS --}}
+            {{-- 5. CATEGORIAS --}}
             <section id="section-categorias" style="display: none;">
                 <h2 style="color: var(--tx);" class="text-3xl font-black mb-8 uppercase tracking-tight">Categorias & Especialidades</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     @foreach($categories as $category)
-                    <div id="category-{{ $category->id }}"
-                         style="background: var(--sf); border: 1px solid var(--bd); color: var(--tx);"
-                         class="p-6 rounded-[24px] flex items-center gap-4 group hover:border-indigo-500 transition-all">
+                    @php
+                        $categoryCount = $diseases->filter(fn ($disease) => (int) ($disease->category_id ?? 0) === (int) $category->id || $disease->categories->contains('id', $category->id))->count();
+                    @endphp
+                    <article id="category-{{ $category->id }}"
+                         style="background: var(--sf); border: 1px solid var(--bd); color: var(--tx); text-align:left; width:100%;"
+                         class="p-6 rounded-[24px] flex flex-col gap-4 group hover:border-indigo-500 transition-all">
+                        <div class="flex items-center gap-4">
                         <div style="background: var(--is); color: var(--in);" class="w-12 h-12 flex items-center justify-center rounded-xl"><i class="fa-solid fa-folder-tree"></i></div>
                         <div>
                             <h4 class="font-bold">{{ $category->name }}</h4>
-                            <span style="color: var(--mu);" class="text-[10px] font-bold uppercase tracking-widest">{{ $category->diseases_count }} Registros</span>
+                            <span style="color: var(--mu);" class="text-[10px] font-bold uppercase tracking-widest">{{ $categoryCount }} Registros</span>
                         </div>
-                    </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" onclick="openInfoModal('category', {{ $category->id }})" class="info-small-btn">Ver descrição</button>
+                            <button type="button" onclick="goToCategory({{ $category->id }})" class="info-small-btn">Ver doenças</button>
+                        </div>
+                    </article>
                     @endforeach
                 </div>
             </section>
@@ -322,6 +441,34 @@
         </div>
     </main>
 
+</div>
+
+<div id="infoModal" class="info-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="infoModalTitle">
+    <div class="info-modal">
+        <div class="info-modal-top">
+            <div class="flex items-start gap-4">
+                <div id="infoModalIcon" class="info-modal-icon"><i class="fa-solid fa-circle-info"></i></div>
+                <div>
+                    <div id="infoModalKind" class="info-modal-kind">Informação clínica</div>
+                    <h2 id="infoModalTitle">Detalhes</h2>
+                </div>
+            </div>
+            <button type="button" class="info-close" onclick="closeInfoModal()" aria-label="Fechar modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p id="infoModalDescription" class="info-modal-desc"></p>
+        <div id="infoModalFacts" class="info-grid"></div>
+        <div id="infoModalRelated"></div>
+    </div>
+</div>
+
+<div id="standardAlertModal" class="std-modal-overlay" role="dialog" aria-modal="true">
+    <div class="std-modal">
+        <h2 id="standardAlertTitle">Atenção</h2>
+        <p id="standardAlertMessage"></p>
+        <div class="std-actions">
+            <button type="button" onclick="closeStandardAlert()" style="background:var(--in);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-weight:800;">Entendi</button>
+        </div>
+    </div>
 </div>
 
 {{-- MODAL LOADING --}}
@@ -401,12 +548,13 @@
         allSymptoms: {!! $symptoms->toJson() !!},
         allPatients: {!! $patients->toJson() !!},
         allDiseases: {!! $diseases->toJson() !!},
-        allCategories: {!! $categories->toJson() !!}
+        allCategories: {!! $categories->toJson() !!},
+        allMedications: {!! $medications->toJson() !!}
     };
     
     // Set initial view for doctors
     @auth
-    @if(Auth::user()->role === 'doctor')
+    @if(in_array(Auth::user()->role, ['doctor', 'medico', 'médico'], true))
     appState.view = 'diagnostico';
     @endif
     @endauth
@@ -454,6 +602,7 @@
             appState.selectedSintomas.push({id, name});
             renderSelectedSymptoms();
         }
+        updateSymptomOptionStyles();
         document.getElementById('searchSymptom').value = '';
         document.getElementById('symptomDropdown').style.display = 'none';
     }
@@ -462,13 +611,14 @@
     function removeSymptom(id) {
         appState.selectedSintomas = appState.selectedSintomas.filter(s => s.id !== id);
         renderSelectedSymptoms();
+        updateSymptomOptionStyles();
     }
 
     // Render selected symptoms
     function renderSelectedSymptoms() {
         const container = document.getElementById('selectedSymptoms');
         container.innerHTML = appState.selectedSintomas.map(s => `
-            <div class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">
+            <div style="background: var(--in); border: 1.5px solid var(--il); color: #fff;" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">
                 <span>${s.name}</span>
                 <button type="button" onclick="removeSymptom(${s.id})"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -477,6 +627,17 @@
         // Update hidden JSON field with symptom IDs
         const ids = appState.selectedSintomas.map(s => s.id);
         document.getElementById('symptomIdsJson').value = JSON.stringify(ids);
+    }
+
+    function updateSymptomOptionStyles() {
+        const selectedIds = appState.selectedSintomas.map(s => String(s.id));
+        document.querySelectorAll('[data-symptom-option]').forEach(btn => {
+            const selected = selectedIds.includes(btn.dataset.symptomOption);
+            btn.classList.toggle('selected', selected);
+            btn.style.background = selected ? 'var(--in)' : 'var(--sf)';
+            btn.style.color = selected ? '#fff' : 'var(--tx)';
+            btn.style.borderColor = selected ? 'var(--il)' : 'var(--bd)';
+        });
     }
 
     // Search symptoms
@@ -504,7 +665,7 @@
         }
         
         dropdown.innerHTML = filtered.map(s => `
-            <button type="button" onclick="addSymptom(${s.id}, '${s.name}')" style="width: 100%; text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--bd); color: var(--tx); transition: background 0.2s; font-weight: 600; font-size: 0.9rem;"
+            <button type="button" onclick='addSymptom(${s.id}, ${JSON.stringify(s.name)})' style="width: 100%; text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--bd); background: transparent; color: var(--tx); transition: background 0.2s; font-weight: 600; font-size: 0.9rem;"
                     onmouseover="this.style.background = 'var(--is)'" onmouseout="this.style.background = 'transparent'">
                 + ${s.name}
             </button>
@@ -542,7 +703,7 @@
         }
         
         results.innerHTML = filtered.map(p => `
-            <button type="button" onclick="selectPatient(${p.id}, '${p.name}')" style="width: 100%; text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--bd); color: var(--tx); transition: background 0.2s;"
+            <button type="button" onclick='selectPatient(${p.id}, ${JSON.stringify(p.name)})' style="width: 100%; text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--bd); background: transparent; color: var(--tx); transition: background 0.2s;"
                     onmouseover="this.style.background = 'var(--is)'" onmouseout="this.style.background = 'transparent'">
                 <p class="font-bold">${p.name}</p>
                 <p style="font-size: 0.75rem; color: var(--mu);" class="uppercase tracking-widest">${p.email}</p>
@@ -583,6 +744,13 @@
                 searchResults.push({type: 'symptom', name: s.name, id: s.id, category: 'Sintomas'});
             }
         });
+
+        appState.allMedications.forEach(m => {
+            const activePrinciple = m.active_principle || '';
+            if (m.name.toLowerCase().includes(query) || activePrinciple.toLowerCase().includes(query)) {
+                searchResults.push({type: 'medication', name: m.name, id: m.id, category: 'Remédios'});
+            }
+        });
         
         appState.allPatients.forEach(p => {
             if (p.name.toLowerCase().includes(query) || p.email.toLowerCase().includes(query)) {
@@ -597,10 +765,10 @@
         });
         
         results.innerHTML = searchResults.slice(0, 8).map(r => `
-            <button type="button" onclick="goToResult('${r.type}', ${r.id}, '${r.name}')" style="width: 100%; text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--bd); color: var(--tx); transition: background 0.2s;"
+            <button type="button" onclick='goToResult(${JSON.stringify(r.type)}, ${r.id}, ${JSON.stringify(r.name)})' style="width: 100%; text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--bd); color: var(--tx); transition: background 0.2s;"
                     onmouseover="this.style.background = 'var(--is)'" onmouseout="this.style.background = 'transparent'">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <i style="color: var(--in); font-size: 0.8rem;" class="fa-solid ${r.type === 'disease' ? 'fa-virus' : r.type === 'symptom' ? 'fa-notes-medical' : r.type === 'patient' ? 'fa-user' : 'fa-folder'}"></i>
+                    <i style="color: var(--in); font-size: 0.8rem;" class="fa-solid ${r.type === 'disease' ? 'fa-virus' : r.type === 'symptom' ? 'fa-notes-medical' : r.type === 'medication' ? 'fa-pills' : r.type === 'patient' ? 'fa-user' : 'fa-folder'}"></i>
                     <div style="flex: 1;">
                         <p style="font-weight: 700; font-size: 0.9rem;">${r.name}</p>
                         <p style="font-size: 0.75rem; color: var(--mu);">${r.category}${r.email ? ' • ' + r.email : ''}</p>
@@ -630,6 +798,7 @@
                     el.scrollIntoView({behavior: 'smooth', block: 'center'});
                     el.classList.add('pulse-item');
                     setTimeout(() => el.classList.remove('pulse-item'), 4000);
+                    openInfoModal('disease', id);
                 }
             }, 100);
         } else if (type === 'symptom') {
@@ -640,30 +809,204 @@
                     el.scrollIntoView({behavior: 'smooth', block: 'center'});
                     el.classList.add('pulse-item');
                     setTimeout(() => el.classList.remove('pulse-item'), 4000);
+                    openInfoModal('symptom', id);
+                }
+            }, 100);
+        } else if (type === 'medication') {
+            switchView('remedios');
+            setTimeout(() => {
+                const el = document.getElementById('medication-' + id);
+                if (el) {
+                    el.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    el.classList.add('pulse-item');
+                    setTimeout(() => el.classList.remove('pulse-item'), 4000);
+                    openInfoModal('medication', id);
                 }
             }, 100);
         } else if (type === 'patient') {
             switchView('diagnostico');
             selectPatient(id, name);
         } else if (type === 'category') {
-            switchView('categorias');
-            setTimeout(() => {
-                const el = document.getElementById('category-' + id);
-                if (el) {
-                    el.scrollIntoView({behavior: 'smooth', block: 'center'});
-                    el.classList.add('pulse-item');
-                    setTimeout(() => el.classList.remove('pulse-item'), 4000);
-                }
-            }, 100);
+            goToCategory(id);
         }
+    }
+
+    function goToCategory(id) {
+        switchView('doencas');
+        window.location.hash = 'categoria-' + id;
+        setTimeout(() => {
+            const el = document.getElementById('disease-category-' + id);
+            if (el) {
+                el.scrollIntoView({behavior: 'smooth', block: 'start'});
+                el.classList.add('pulse-item');
+                setTimeout(() => el.classList.remove('pulse-item'), 4000);
+            }
+        }, 120);
+    }
+
+    function openStandardAlert(message, title = 'Atenção') {
+        document.getElementById('standardAlertTitle').textContent = title;
+        document.getElementById('standardAlertMessage').textContent = message;
+        document.getElementById('standardAlertModal').classList.add('open');
+    }
+
+    function closeStandardAlert() {
+        document.getElementById('standardAlertModal').classList.remove('open');
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, function (char) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[char];
+        });
+    }
+
+    function pickItem(type, id) {
+        const dictionaries = {
+            disease: appState.allDiseases,
+            symptom: appState.allSymptoms,
+            category: appState.allCategories,
+            medication: appState.allMedications
+        };
+
+        return (dictionaries[type] || []).find(item => Number(item.id) === Number(id));
+    }
+
+    function openInfoModal(type, id) {
+        const item = pickItem(type, id);
+        if (!item) return;
+
+        const config = {
+            disease: { kind: 'Doença', icon: 'fa-virus' },
+            symptom: { kind: 'Sintoma', icon: 'fa-notes-medical' },
+            category: { kind: 'Categoria clínica', icon: 'fa-layer-group' },
+            medication: { kind: 'Remédio', icon: 'fa-pills' }
+        }[type] || { kind: 'Informação clínica', icon: 'fa-circle-info' };
+
+        const description = item.brief_description
+            || item.description
+            || item.descriptions?.[0]?.content
+            || 'Informação clínica em atualização.';
+
+        document.getElementById('infoModalKind').textContent = config.kind;
+        document.getElementById('infoModalTitle').textContent = item.name;
+        document.getElementById('infoModalIcon').innerHTML = `<i class="fa-solid ${config.icon}"></i>`;
+        document.getElementById('infoModalDescription').textContent = description;
+        document.getElementById('infoModalFacts').innerHTML = renderInfoFacts(type, item);
+        document.getElementById('infoModalRelated').innerHTML = renderInfoRelated(type, item);
+        document.getElementById('infoModal').classList.add('open');
+    }
+
+    function closeInfoModal() {
+        document.getElementById('infoModal').classList.remove('open');
+    }
+
+    function renderInfoFacts(type, item) {
+        const facts = [];
+
+        if (type === 'disease') {
+            facts.push(['CID', item.icd_code || 'Não informado']);
+            facts.push(['Severidade', formatSeverity(item.severity)]);
+            facts.push(['Faixa etária', `${item.min_age ?? 0} a ${item.max_age ?? 120} anos`]);
+            facts.push(['Gênero alvo', formatGender(item.target_gender)]);
+        }
+
+        if (type === 'symptom') {
+            facts.push(['Severidade', formatSeverity(item.severity)]);
+            facts.push(['Doenças relacionadas', `${item.diseases?.length || 0}`]);
+        }
+
+        if (type === 'medication') {
+            facts.push(['Princípio ativo', item.active_principle || 'Não informado']);
+            facts.push(['Condições associadas', `${item.diseases?.length || 0}`]);
+        }
+
+        if (type === 'category') {
+            facts.push(['Registros', `${item.diseases_count || 0}`]);
+            facts.push(['Tipo', 'Agrupamento clínico']);
+        }
+
+        return facts.map(([label, value]) => `
+            <div class="info-kv">
+                <span>${escapeHtml(label)}</span>
+                <strong>${escapeHtml(value)}</strong>
+            </div>
+        `).join('');
+    }
+
+    function renderInfoRelated(type, item) {
+        if (type === 'disease') {
+            return renderPills('Sintomas relacionados', item.symptoms, 'fa-notes-medical')
+                + renderPills('Medicamentos associados', item.medications, 'fa-pills')
+                + renderPills('Categorias', item.categories, 'fa-layer-group');
+        }
+
+        if (type === 'symptom') {
+            return renderPills('Doenças relacionadas', item.diseases, 'fa-virus');
+        }
+
+        if (type === 'medication') {
+            return renderPills('Usado em condições como', item.diseases, 'fa-virus');
+        }
+
+        if (type === 'category') {
+            const diseases = appState.allDiseases.filter(disease =>
+                Number(disease.category_id || 0) === Number(item.id)
+                || (disease.categories || []).some(category => Number(category.id) === Number(item.id))
+            );
+
+            return renderPills('Doenças nesta categoria', diseases, 'fa-virus');
+        }
+
+        return '';
+    }
+
+    function renderPills(title, items, icon) {
+        if (!items || items.length === 0) return '';
+
+        return `
+            <div style="margin-top:18px;">
+                <h3 style="font-size:.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--in);margin-bottom:10px;">${escapeHtml(title)}</h3>
+                <div class="info-list">
+                    ${items.slice(0, 10).map(item => `<span class="info-pill"><i class="fa-solid ${icon}"></i>${escapeHtml(item.name)}</span>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    function formatSeverity(severity) {
+        const map = {
+            low: 'Leve',
+            medium: 'Moderada',
+            high: 'Alta',
+            critical: 'Crítica',
+            1: 'Leve',
+            2: 'Moderada',
+            3: 'Alta',
+            4: 'Crítica'
+        };
+
+        return map[severity] || severity || 'Não informada';
+    }
+
+    function formatGender(gender) {
+        return {
+            both: 'Todos',
+            m: 'Masculino',
+            f: 'Feminino',
+            male: 'Masculino',
+            female: 'Feminino'
+        }[gender] || 'Todos';
     }
 
     // Set form loading state
     // Validate form before submission
     function validateDiagnosticForm(event) {
-        // Hide previous error if exists
-        document.getElementById('formErrorNotification').style.display = 'none';
-
         // Get form data
         const gender = document.getElementById('gender')?.value;
         const age = document.getElementById('age')?.value;
@@ -673,11 +1016,7 @@
 
         // Helper function to show error
         function showError(message) {
-            const notif = document.getElementById('formErrorNotification');
-            const msg = document.getElementById('formErrorMessage');
-            msg.textContent = message;
-            notif.style.display = 'flex';
-            notif.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            openStandardAlert(message, 'Dados incompletos');
         }
 
         // Validate all required fields
@@ -736,9 +1075,23 @@
         }
     });
 
+    document.getElementById('infoModal')?.addEventListener('click', function(event) {
+        if (event.target === this) closeInfoModal();
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeInfoModal();
+            closeStandardAlert();
+        }
+    });
+
     // Initialize - show first section
     window.addEventListener('DOMContentLoaded', function() {
         switchView(appState.view);
+        @if($errors->any() || session('error'))
+            openStandardAlert(@js(session('error') ?: $errors->first()), 'Erro ao processar diagnóstico');
+        @endif
     });
 </script>
 </body>

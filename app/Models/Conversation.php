@@ -12,7 +12,7 @@ class Conversation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['sender_id', 'receiver_id'];
+    protected $fillable = ['sender_id', 'receiver_id', 'title'];
 
     /**
      * Obtém todas as mensagens desta conversa.

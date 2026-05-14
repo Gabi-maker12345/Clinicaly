@@ -521,6 +521,9 @@
     </nav>
 
     <section class="pt-40 pb-24 px-6 relative overflow-hidden">
+        <!-- Particles Canvas -->
+        <canvas id="particlesCanvas" class="absolute inset-0 w-full h-full" style="pointer-events: none;"></canvas>
+        
         <div class="absolute top-20 right-10 w-72 h-72 bg-indigo-300/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-float dark:bg-indigo-900/20 dark:mix-blend-screen"></div>
         <div class="absolute top-40 left-10 w-72 h-72 bg-purple-300/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
 
@@ -794,7 +797,117 @@
     </footer>
 
     <script>
+        // ===== Particles Effect =====
+        class ParticleSystem {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                if (!this.canvas) return;
+                
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.particleCount = 25;
+                
+                this.resizeCanvas();
+                this.init();
+                this.animate();
+                
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight * 0.6;
+            }
+
+            init() {
+                this.particles = [];
+                for (let i = 0; i < this.particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 3 + 1.5,
+                        speedX: (Math.random() - 0.5) * 0.3,
+                        speedY: (Math.random() - 0.5) * 0.3,
+                        opacity: Math.random() * 0.55 + 0.3,
+                        color: this.getRandomColor(),
+                        pulsePhase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+
+            getRandomColor() {
+                const colors = [
+                    'rgba(109, 85, 177, ', // indigo-600
+                    'rgba(99, 102, 241, ',  // indigo-500
+                    'rgba(168, 85, 247, ',  // purple-500
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.particles.forEach((particle, index) => {
+                    // Update position
+                    particle.x += particle.speedX;
+                    particle.y += particle.speedY;
+
+                    // Wrap around edges
+                    if (particle.x < 0) particle.x = this.canvas.width;
+                    if (particle.x > this.canvas.width) particle.x = 0;
+                    if (particle.y < 0) particle.y = this.canvas.height;
+                    if (particle.y > this.canvas.height) particle.y = 0;
+
+                    // Pulse effect
+                    particle.pulsePhase += 0.01;
+                    const pulse = Math.sin(particle.pulsePhase) * 0.5 + 0.5;
+                    const opacity = particle.opacity * pulse;
+
+                    // Draw particle with glow
+                    this.ctx.fillStyle = particle.color + opacity + ')';
+                    this.ctx.shadowColor = particle.color + (opacity * 0.8) + ')';
+                    this.ctx.shadowBlur = 8;
+                    this.ctx.shadowOffsetX = 0;
+                    this.ctx.shadowOffsetY = 0;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    this.ctx.shadowColor = 'transparent';
+                    this.ctx.shadowBlur = 0;
+
+                    // Draw subtle connections
+                    this.particles.forEach((otherParticle, otherIndex) => {
+                        if (index < otherIndex) {
+                            const dx = particle.x - otherParticle.x;
+                            const dy = particle.y - otherParticle.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+
+                            if (distance < 180) {
+                                const lineOpacity = (1 - distance / 180) * 0.4;
+                                this.ctx.strokeStyle = particle.color + lineOpacity + ')';
+                                this.ctx.lineWidth = 1.2;
+                                this.ctx.lineCap = 'round';
+                                this.ctx.lineJoin = 'round';
+                                this.ctx.beginPath();
+                                this.ctx.moveTo(particle.x, particle.y);
+                                this.ctx.lineTo(otherParticle.x, otherParticle.y);
+                                this.ctx.stroke();
+                            }
+                        }
+                    });
+                });
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize particles when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
+            new ParticleSystem('particlesCanvas');
+            
+            // ===== Resto do código existente =====
             // 1. Scroll Reveal Logic (Intersection Observer)
             const revealOptions = {
                 threshold: 0.15,

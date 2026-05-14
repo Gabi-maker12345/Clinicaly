@@ -232,9 +232,15 @@ a{text-decoration:none;color:inherit;}
                 <a href="{{ route('dashboard') }}" class="b-sc" style="text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;">
                     <i class="fa-solid fa-hourglass-end"></i> Analisar Depois
                 </a>
+                @if($diagnostico)
                 <a href="{{ route('diagnostico.validar', $diagnostico->id) }}" class="b-ac" style="text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;">
                     <i class="fa-solid fa-check-circle"></i> Validar Diagnóstico
                 </a>
+                @else
+                <a href="{{ route('discovery.index') }}" class="b-ac" style="text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;">
+                    <i class="fa-solid fa-plus"></i> Novo Diagnóstico
+                </a>
+                @endif
             </div>
 
             <!-- Disclaimer -->
@@ -260,8 +266,11 @@ a{text-decoration:none;color:inherit;}
     <script>
         // Theme management
         (function() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
+            const savedTheme = localStorage.getItem('cl-theme') || localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'cl-theme') document.documentElement.setAttribute('data-theme', e.newValue || 'light');
+            });
         })();
 
         // Apply Dosis font globally

@@ -2,297 +2,278 @@
 
 @section('content')
 <style>
-.topbar{position:sticky;top:0;z-index:50;background:var(--sf);border-bottom:1px solid var(--bd);box-shadow:var(--sh);display:flex;align-items:center;gap:12px;padding:0 24px;height:60px;}
-.logo{font-size:1.05rem;font-weight:800;letter-spacing:.1em;background:linear-gradient(135deg,var(--in),var(--il));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;}
-.vid{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;}
-.page{max-width:100%;margin:0 auto;padding:24px 24px 0; height: 100%; display: flex; flex-direction: column; overflow: hidden;}
-@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.fi{animation:fi .3s ease both;}.fi1{animation-delay:.05s;}.fi2{animation-delay:.1s;}.fi3{animation-delay:.15s;}
-.rb{font-family:'Space Mono',monospace;font-size:.55rem;padding:4px 12px;border-radius:20px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;display:inline-block;}
-.rb-gr{background:var(--gb);color:var(--gr);border:1.5px solid var(--gbd);}
-.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px;box-shadow:var(--sh); height: 60vh; overflow-y: scroll;}
-.ct{font-family:'Space Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--mu);display:flex;align-items:center;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--bd);margin-bottom:16px;}
-.av{display:flex;align-items:center;justify-content:center;font-weight:700;border-radius:50%;flex-shrink:0;}
-.av-gr{background:var(--gb);color:var(--gr);border:1.5px solid var(--gbd);}
-.av-bl{background:var(--bb);color:var(--bl);border:1.5px solid var(--bbd);}
-.av-sm{width:40px;height:40px;font-size:.85rem;}
-.ib{background:transparent;border:1.5px solid var(--bd);border-radius:50%;width:36px;height:36px;cursor:pointer;color:var(--mu);display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .2s;position:relative;}
-.ib:hover{border-color:var(--in);color:var(--in);background:var(--is);}
-.nd{position:absolute;top:-1px;right:-1px;width:8px;height:8px;border-radius:50%;background:var(--rd);border:2px solid var(--sf);}
-.tb{background:var(--sf2);border:1.5px solid var(--bd);border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:.85rem;transition:all .2s;}
-.tb:hover{border-color:var(--in);color:var(--in);}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:30px;border:none;font-family:'Dosis',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;white-space:nowrap;justify-content:center;}
-.bsm{padding:8px 16px;font-size:.9rem;}
-.b-pr{background:var(--in);color:#fff;}
-.b-pr:hover{background:var(--il);}
-.b-gh{background:transparent;color:var(--mu);border:1.5px solid var(--bd);}
-.b-gh:hover{background:var(--is);border-color:var(--in);color:var(--in);}
-.bxs{padding:6px 12px;font-size:.85rem;}
-.ch-win{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;padding:16px 4px;}
-.ch-mt{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--fa);margin-bottom:4px;}.ch-mt.r{text-align:right;margin-top:14px;}
-.bub{max-width:72%; width: fit-content; padding:10px 16px; border-radius:18px; font-size:.95rem; line-height:1.5; word-wrap: break-word;}
-.bub-rc{background:var(--sf2);border:1.5px solid var(--bd);border-bottom-left-radius:4px; align-self: flex-start;}
-.bub-sn{background:var(--in);color:#fff;border-bottom-right-radius:4px; align-self: flex-end;}
-.ch-bar{display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--bd); flex-shrink: 0;}
-.ch-bar input{flex:1;background:var(--sf2);border:1.5px solid var(--bd);border-radius:30px;padding:12px 18px;color:var(--tx);font-family:'Dosis',sans-serif;font-size:.95rem;outline:none;}
-.ch-bar input:focus{border-color:var(--in);}
-.conv-item{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--bd);text-decoration:none;color:inherit;transition:background .15s;}
-.conv-item:hover{background:var(--sf2);}
-.conv-item.active{background:var(--is);}
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
-[x-cloak] { display: none !important; }
-/* Custom Scrollbar para combinar com o design */
-.ch-win::-webkit-scrollbar, aside ul::-webkit-scrollbar { width: 5px; }
-.ch-win::-webkit-scrollbar-track, aside ul::-webkit-scrollbar-track { background: transparent; }
-.ch-win::-webkit-scrollbar-thumb, aside ul::-webkit-scrollbar-thumb { background: var(--bd); border-radius: 10px; }
+    .chat-shell{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;min-height:620px}
+    .conversation-list{padding:0;overflow:hidden;display:flex;flex-direction:column}
+    .conversation-row{position:relative;display:flex;align-items:stretch;border-bottom:1px solid var(--bd)}
+    .conversation-item{display:flex;align-items:center;gap:12px;padding:14px 10px 14px 16px;text-decoration:none;color:var(--tx);transition:.15s;min-width:0;flex:1}
+    .conversation-item:hover,.conversation-item.active{background:var(--is);color:var(--in)}
+    .conversation-actions{display:flex;align-items:center;padding-right:10px}
+    .chat-panel{display:flex;flex-direction:column;min-height:620px}
+    .chat-messages{flex:1;overflow-y:auto;padding:12px 6px 18px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--bd2) transparent}
+    .chat-messages::-webkit-scrollbar,.conversation-scroll::-webkit-scrollbar{width:4px}
+    .chat-messages::-webkit-scrollbar-track,.conversation-scroll::-webkit-scrollbar-track{background:transparent}
+    .chat-messages::-webkit-scrollbar-thumb,.conversation-scroll::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:999px}
+    .msg{display:block;width:auto;max-width:100%;min-width:2.75rem;margin:0;padding:10px 15px;border-radius:18px;font-weight:600;line-height:1.45;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;hyphens:auto;flex:0 1 auto}
+    .msg.received{background:var(--sf2);border:1px solid var(--bd);border-bottom-left-radius:5px;align-self:flex-start}
+    .msg.sent{background:var(--in);color:#fff;border-bottom-right-radius:5px;align-self:flex-end}
+    .msg-meta{font:700 .62rem 'Space Mono',monospace;color:var(--fa);margin:0 0 4px}
+    .msg-wrap{display:flex;flex-direction:column;align-items:flex-start;position:relative;width:100%;max-width:100%}
+    .msg-wrap.sent{align-items:flex-end;text-align:right}
+    .msg-line{display:inline-flex;align-items:flex-start;gap:6px;width:auto;max-width:min(74ch,88%);min-width:0}
+    .msg-wrap:not(.sent) .msg-line{align-self:flex-start}
+    .msg-wrap.sent .msg-line{align-self:flex-end;flex-direction:row-reverse}
+    .dots-btn{width:30px;height:30px;border-radius:999px;border:1px solid var(--bd);background:var(--sf2);color:var(--mu);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+    .dots-btn:hover{background:var(--is);color:var(--in);border-color:var(--in)}
+    .action-menu{position:absolute;right:8px;top:34px;z-index:30;min-width:132px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh2);padding:6px}
+    .conversation-row .action-menu{right:12px;top:44px}
+    .action-menu button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;color:var(--tx);padding:9px 10px;border-radius:9px;font-weight:700;text-align:left}
+    .action-menu button:hover{background:var(--is);color:var(--in)}
+    .edit-message{display:flex;gap:8px;max-width:min(78ch,82%);width:min(78ch,82%)}
+    .edit-message input{width:100%;border:1.5px solid var(--bd);border-radius:14px;background:var(--sf2);color:var(--tx);padding:10px 12px;font-weight:700;outline:none}
+    .std-modal-overlay{--modal-sf:#fff;--modal-sf2:#f7f9fc;--modal-bd:#dbe2ee;--modal-tx:#192132;--modal-mu:#6e7a91;--modal-in:#6d55b1;position:fixed;inset:0;z-index:2147483000;background:rgba(10,8,20,.62);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;overscroll-behavior:contain}
+    html[data-theme="dark"] .std-modal-overlay{--modal-sf:#131128;--modal-sf2:#1a1735;--modal-bd:#302a55;--modal-tx:#e8e4f8;--modal-mu:#8880aa;--modal-in:#9880d4}
+    .std-modal{width:min(420px,calc(100vw - 32px));max-height:none;overflow:visible;background:var(--modal-sf);border:1px solid var(--modal-bd);border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.28);padding:22px;color:var(--modal-tx)}
+    .std-modal h2{font-size:1.05rem;font-weight:800;color:var(--modal-tx);margin:0 0 8px}.std-modal p{color:var(--modal-mu);font-weight:600;line-height:1.45;margin:0 0 14px}.std-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+    .std-modal input{width:100%;border:1.5px solid var(--modal-bd);border-radius:12px;background:var(--modal-sf2);color:var(--modal-tx);padding:11px 13px;font-weight:700;outline:none}.std-modal input:focus{border-color:var(--modal-in);box-shadow:0 0 0 3px rgba(109,85,177,.13)}
+    .chat-form{display:flex;gap:10px;padding-top:16px;border-top:1px solid var(--bd)}
+    .chat-form input,.user-search input{width:100%;border:1.5px solid var(--bd);border-radius:999px;background:var(--sf2);color:var(--tx);padding:12px 16px;font-weight:700;outline:none}
+    .search-result{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:0;border-bottom:1px solid var(--bd);background:transparent;color:var(--tx);text-align:left;cursor:pointer}
+    .search-result:hover{background:var(--is)}
+    body.conversation-modal-open{overflow:hidden!important}
+    @media(max-width:980px){.chat-shell{grid-template-columns:1fr}.chat-panel{min-height:560px}}
 </style>
 
-<main class="page" style="max-width:1400px;margin:0 auto;">
-  <section class="fi" aria-labelledby="pg-h">
-    <header style="margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
-      <div>
-      </div>
-      <a href="{{ route('dashboard') }}" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:30px;background:transparent;border:1.5px solid var(--bd);color:var(--mu);text-decoration:none;font-size:.85rem;font-weight:700;transition:all .2s;" onmouseover="this.style.borderColor='var(--in)';this.style.color='var(--in)';this.style.background='var(--is)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--mu)';this.style.background='transparent'" title="Voltar ao dashboard">
-        <i class="fa-solid fa-arrow-left" style="font-size:.78rem;"></i> Dashboard
-      </a>
-    </header>
-    <h1 id="pg-h" style="font-size:1.55rem;font-weight:800;margin-bottom:4px;">Chat Médico–Paciente</h1>
-  </section>
+<div x-data="{
+    modalOpen: false,
+    modalTitle: '',
+    modalMessage: '',
+    modalConfirm: null,
+    editOpen: false,
+    editAction: '',
+    editTitle: '',
+    deleteOpen: false,
+    deleteAction: '',
+    openEdit(action, title){ this.editAction = action; this.editTitle = title || ''; this.editOpen = true; },
+    openDelete(action){ this.deleteAction = action; this.deleteOpen = true; },
+    openConfirm(title, message, onConfirm){ this.modalTitle = title; this.modalMessage = message; this.modalConfirm = onConfirm; this.modalOpen = true; },
+    closeModals(){ this.editOpen = false; this.deleteOpen = false; this.modalOpen = false; this.modalConfirm = null; },
+    runConfirm(){ const action = this.modalConfirm; this.modalOpen = false; this.modalConfirm = null; if(action) action(); }
+}" @clinicaly-confirm.window="openConfirm($event.detail.title, $event.detail.message, $event.detail.onConfirm)"
+   @conversation-edit.window="openEdit($event.detail.action, $event.detail.title)"
+   @conversation-delete.window="openDelete($event.detail.action)"
+   @keydown.escape.window="closeModals()"
+   x-effect="document.body.classList.toggle('conversation-modal-open', editOpen || deleteOpen || modalOpen)"
+   x-init="$watch('editOpen', value => { if (value) $nextTick(() => $refs.conversationTitleInput?.focus()) })">
 
-  {{-- Search Users Bar --}}
-  <div x-data="{ search: '', results: [], loading: false, open: false }" style="margin-top:16px;margin-bottom:16px;" @click.away="open = false">
-    <div style="position:relative;">
-      <input 
-        x-model="search" 
-        @input="
-          if(search.length < 2) { results = []; loading = false; return; }
-          open = true;
-          loading = true;
-          fetch('{{ route('messages.search') }}?q=' + encodeURIComponent(search))
+<section style="margin-bottom:20px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+    <div>
+        <span class="tag info"><i class="fa-solid fa-comments"></i> Conversas</span>
+        <h1 style="font-size:1.8rem;font-weight:800;margin-top:12px;color:var(--tx);">Minhas Conversas</h1>
+    </div>
+    <a href="{{ route('dashboard') }}" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i>Voltar</a>
+</section>
+
+<div class="user-search" x-data="{ search: '', results: [], loading: false, open: false }" @click.away="open = false" style="position:relative;margin-bottom:18px;">
+    <input x-model="search" @focus="open = true" @input="
+        if (search.length < 2) { results = []; loading = false; return; }
+        open = true; loading = true;
+        fetch('{{ route('messages.search') }}?q=' + encodeURIComponent(search))
             .then(r => r.json())
             .then(data => { results = data; loading = false; })
             .catch(() => { results = []; loading = false; });
-        "
-        type="text" 
-        placeholder="Pesquisar usuário para iniciar conversa..." 
-        style="width:100%;padding:12px 18px;border:1.5px solid var(--bd);border-radius:30px;background:var(--sf2);color:var(--tx);font-family:'Dosis',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;"
-        @focus="open = true"
-      >
-      <i class="fa-solid fa-magnifying-glass" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--mu);font-size:.85rem;pointer-events:none;"></i>
-      
-      {{-- Dropdown Results --}}
-      <div x-show="open && (results.length > 0 || loading)" @click.stop style="position:absolute;top:100%;left:0;right:0;background:var(--sf);border:1.5px solid var(--bd);border-top:none;border-radius:0 0 14px 14px;max-height:300px;overflow-y:auto;z-index:10;margin-top:-2px;box-shadow:var(--sh2);">
-        <template x-if="loading">
-          <div style="padding:16px;text-align:center;color:var(--mu);font-size:.9rem;">
-            <i class="fa-solid fa-spinner fa-spin"></i> Pesquisando...
-          </div>
-        </template>
-
+    " type="search" placeholder="Pesquisar usuário para iniciar conversa">
+    <div x-show="open && (loading || search.length >= 2)" x-cloak class="card" style="position:absolute;z-index:20;left:0;right:0;top:calc(100% + 8px);padding:0;overflow:hidden;">
+        <template x-if="loading"><div style="padding:16px;color:var(--mu);"><i class="fa-solid fa-spinner fa-spin"></i> Pesquisando...</div></template>
         <template x-for="user in results" :key="user.id">
-          <form method="POST" :action="'{{ route('messages.start', '__USER_ID__') }}'.replace('__USER_ID__', user.id)" style="padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px;transition:background .2s;width:100%;" @mouseenter="this.style.background='var(--bg)'" @mouseleave="this.style.background='transparent'">
-            @csrf
-            <img :src="user.profile_photo_url" :alt="user.name" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;">
-            <div style="flex:1;min-width:0;">
-              <p style="margin:0;font-weight:600;font-size:.92rem;color:var(--tx);">
-                <span x-text="user.name"></span>
-              </p>
-              <p style="margin:4px 0 0 0;font-size:.78rem;color:var(--mu);text-transform:uppercase;">
-                <span x-text="user.role === 'doctor' ? 'Médico' : 'Paciente'"></span>
-              </p>
-            </div>
-            <button type="submit" class="btn b-gh bxs" style="margin-left:8px;padding:8px 12px;font-size:.85rem;flex-shrink:0;">
-              <i class="fa-solid fa-message" aria-hidden="true"></i> Chat
-            </button>
-          </form>
-        </template>
-
-        <template x-if="!loading && results.length === 0 && search.length >= 2">
-          <div style="padding:16px;text-align:center;color:var(--mu);font-size:.9rem;">
-            Nenhum usuário encontrado
-          </div>
-        </template>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid fi fi1" style="margin-top:8px;grid-template-columns:320px 1fr;gap:20px; flex: 1; overflow: hidden; padding-bottom: 24px;">
-    {{-- Sidebar: Lista de Conversas --}}
-    <aside aria-labelledby="conv-h" style="height:90vh;overflow-y:auto;display:flex;flex-direction:column;">
-      <div class="card" style="padding:0;overflow:hidden;display:flex;flex-direction:column;flex:1;">
-        <h2 class="ct" id="conv-h" style="padding:14px 16px;margin-bottom:0;border-bottom:1px solid var(--bd);">
-          <i class="fa-solid fa-comments" aria-hidden="true"></i> Conversas
-        </h2>
-        <ul style="list-style:none; overflow-y:auto; flex:1;">
-          @forelse($conversations ?? $conversation as $conv)
-            @php
-              $participant = $conv->sender_id == auth()->id() ? $conv->receiver : $conv->sender;
-              $lastMessage = $conv->messages->first();
-              $unreadCount = $conv->messages->where('read', false)->where('user_id', '!=', auth()->id())->count();
-            @endphp
-            <li class="group relative">
-              <a href="{{ route('messages.show', $conv->id) }}" class="conv-item {{ request()->route('conversation') && request()->route('conversation')->id === $conv->id ? 'active' : '' }}" aria-current="{{ request()->route('conversation') && request()->route('conversation')->id === $conv->id ? 'page' : 'false' }}">
-                <span class="av {{ $participant?->role === 'doctor' ? 'av-gr' : 'av-bl' }} av-sm" aria-hidden="true">
-                  {{ substr($participant?->name ?? '', 0, 2) }}
-                </span>
-                <div style="flex:1;min-width:0;">
-                  <p style="font-weight:700;font-size:.92rem;margin:0;">{{ $participant?->name }}</p>
-                  <p style="font-size:.78rem;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:4px 0 0 0;">
-                    {{ $lastMessage?->body ?? 'Sem mensagens ainda' }}
-                  </p>
-                </div>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
-                  <span style="font-family:'Space Mono',monospace;font-size:.62rem;color:var(--mu);">
-                    {{ $conv->updated_at->format('H:i') }}
-                  </span>
-                  @if($unreadCount > 0)
-                    <span style="width:7px;height:7px;border-radius:50%;background:var(--rd);display:inline-block;" aria-label="Não lida"></span>
-                  @endif
-                </div>
-              </a>
-
-              {{-- Menu de Opções da Conversa (Padrão chat-i-a) --}}
-              <div class="absolute right-2 top-1/2 -translate-y-1/2" x-data="{ menuOpen: false }">
-                <button @click.prevent.stop="menuOpen = !menuOpen" class="p-1 text-slate-400 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+            <form method="POST" :action="'{{ route('messages.start', '__USER_ID__') }}'.replace('__USER_ID__', user.id)">
+                @csrf
+                <button type="submit" class="search-result">
+                    <img :src="user.profile_photo_url" :alt="user.name" style="width:38px;height:38px;border-radius:50%;object-fit:cover;">
+                    <span style="flex:1;"><strong x-text="user.name"></strong><small style="display:block;color:var(--mu);font:700 .62rem 'Space Mono',monospace;text-transform:uppercase;" x-text="['doctor','medico','médico'].includes(user.role) ? 'Médico' : 'Paciente'"></small></span>
+                    <i class="fa-solid fa-message" style="color:var(--in);"></i>
                 </button>
-                <div x-show="menuOpen" @click.away="menuOpen = false" x-cloak class="absolute right-0 mt-1 w-32 bg-white border border-gray-100 shadow-xl rounded-xl py-2 z-[100]">
-                    <button class="w-full text-left px-4 py-2 text-[10px] text-slate-600 hover:bg-slate-50 flex items-center gap-2">
-                        Marcar lida
-                    </button>
-                    <button class="w-full text-left px-4 py-2 text-[10px] text-red-500 hover:bg-red-50 flex items-center gap-2 font-bold">
-                        Excluir chat
-                    </button>
+            </form>
+        </template>
+        <template x-if="!loading && search.length >= 2 && results.length === 0"><div style="padding:16px;color:var(--mu);">Nenhum usuário encontrado.</div></template>
+    </div>
+</div>
+
+<div class="chat-shell">
+    <aside class="card conversation-list">
+        <h2 style="padding:16px;margin:0;border-bottom:1px solid var(--bd);font:700 .65rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--mu);">
+            <i class="fa-solid fa-inbox"></i> Conversas
+        </h2>
+        <div class="conversation-scroll" style="overflow:auto;min-height:0;">
+            @forelse($conversations ?? collect() as $conv)
+                @php
+                    $participant = $conv->sender_id == auth()->id() ? $conv->receiver : $conv->sender;
+                    $lastMessage = $conv->messages->first();
+                    $active = isset($conversation) && $conversation->id === $conv->id;
+                    $displayTitle = $conv->title ?: ($participant?->name ?? 'Usuário');
+                @endphp
+                <div class="conversation-row" x-data="{ open: false }" @click.away="open = false">
+                    <a href="{{ route('messages.show', $conv->id) }}" class="conversation-item {{ $active ? 'active' : '' }}">
+                        <img src="{{ $participant?->profile_photo_url }}" alt="{{ $participant?->name }}" style="width:42px;height:42px;border-radius:14px;object-fit:cover;">
+                        <span style="min-width:0;flex:1;">
+                            <strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $displayTitle }}</strong>
+                            <small style="display:block;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $lastMessage?->body ?? 'Sem mensagens ainda' }}</small>
+                        </span>
+                        <small style="color:var(--fa);font-family:'Space Mono',monospace;">{{ $conv->updated_at?->format('H:i') }}</small>
+                    </a>
+                    <div class="conversation-actions">
+                        <button type="button" class="dots-btn" @click.stop="open = !open" aria-label="Ações da conversa"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+                    <div x-show="open" x-cloak class="action-menu">
+                        <button type="button" @click="open = false; window.dispatchEvent(new CustomEvent('conversation-edit', {detail: {action: '{{ route('messages.conversations.update', $conv->id) }}', title: @js($conv->title ?: '')}}))"><i class="fa-solid fa-pen"></i>Editar</button>
+                        <button type="button" @click="open = false; window.dispatchEvent(new CustomEvent('conversation-delete', {detail: {action: '{{ route('messages.conversations.destroy', $conv->id) }}'}}))"><i class="fa-solid fa-trash"></i>Excluir</button>
+                    </div>
                 </div>
-              </div>
-            </li>
-          @empty
-            <li style="padding:14px;text-align:center;">
-              <p style="color:var(--mu);font-size:.86rem;">Nenhuma conversa iniciada</p>
-            </li>
-          @endforelse
-        </ul>
-      </div>
+            @empty
+                <p style="padding:22px;color:var(--mu);text-align:center;">Nenhuma conversa iniciada.</p>
+            @endforelse
+        </div>
     </aside>
 
-    {{-- Janela de Chat Ativa --}}
-    @if(isset($messages))
-      @php
-        $participant = $conversation->sender_id === auth()->id() ? $conversation->receiver : $conversation->sender;
-      @endphp
-      <article 
-        class="card" 
-        style="display:flex;flex-direction:column;height:90vh;overflow-y:auto;" 
-        aria-labelledby="chat-h"
-        x-data="{ 
-            body: '', 
-            messages: {{ $messages->toJson() }},
-            authId: {{ auth()->id() }},
+    @if(isset($conversation, $messages))
+        @php $participant = $conversation->sender_id == auth()->id() ? $conversation->receiver : $conversation->sender; @endphp
+        <article class="card chat-panel" x-data="{
+            body: '',
             sending: false,
-            scrollToBottom() {
-                this.$nextTick(() => {
-                    const win = document.getElementById('chat-win');
-                    win.scrollTop = win.scrollHeight;
+            editingId: null,
+            editingBody: '',
+            openMenu: null,
+            messages: @js($messages->load('user')),
+            authId: {{ auth()->id() }},
+            scroll(){ this.$nextTick(() => { const el = this.$refs.messages; el.scrollTop = el.scrollHeight; }); },
+            edit(msg){ this.editingId = msg.id; this.editingBody = msg.body; this.openMenu = null; },
+            cancelEdit(){ this.editingId = null; this.editingBody = ''; },
+            async saveEdit(msg){
+                if(!this.editingBody.trim()) return;
+                const response = await fetch('{{ route('messages.update', '__MESSAGE_ID__') }}'.replace('__MESSAGE_ID__', msg.id), {
+                    method: 'PATCH',
+                    headers: {'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
+                    body: JSON.stringify({body: this.editingBody})
                 });
+                if(response.ok){
+                    const updated = await response.json();
+                    this.messages = this.messages.map(item => item.id === updated.id ? updated : item);
+                    this.cancelEdit();
+                }
             },
-            async sendMessage() {
+            async deleteMessage(msg){
+                window.dispatchEvent(new CustomEvent('clinicaly-confirm', {detail: {
+                    title: 'Excluir mensagem',
+                    message: 'Esta mensagem será removida da conversa.',
+                    onConfirm: async () => {
+                        const response = await fetch('{{ route('messages.destroy', '__MESSAGE_ID__') }}'.replace('__MESSAGE_ID__', msg.id), {
+                            method: 'DELETE',
+                            headers: {'Accept':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'}
+                        });
+                        if(response.ok){ this.messages = this.messages.filter(item => item.id !== msg.id); this.openMenu = null; }
+                    }
+                }}));
+            },
+            async send(){
                 if(!this.body.trim() || this.sending) return;
                 this.sending = true;
-                const res = await fetch('{{ route('messages.store') }}', {
+                const response = await fetch('{{ route('messages.store') }}', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
-                    body: JSON.stringify({ conversation_id: {{ $conversation->id }}, body: this.body })
+                    headers: {'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}'},
+                    body: JSON.stringify({conversation_id: {{ $conversation->id }}, body: this.body})
                 });
-                const newMsg = await res.json();
-                this.messages.push(newMsg);
-                this.body = '';
+                if(response.ok){ this.messages.push(await response.json()); this.body = ''; this.scroll(); }
                 this.sending = false;
-                this.scrollToBottom();
             }
-        }"
-        x-init="scrollToBottom()"
-      >
-        <header style="padding-bottom:14px;border-bottom:1px solid var(--bd);margin-bottom:16px;display:flex;align-items:center;gap:10px;">
-          <span class="av {{ $participant?->role === 'doctor' ? 'av-gr' : 'av-bl' }} av-sm" aria-hidden="true">
-            {{ substr($participant?->name ?? '', 0, 2) }}
-          </span>
-          <div>
-            <h2 id="chat-h" style="font-weight:700;font-size:1.05rem;margin:0;">{{ $participant?->name }}</h2>
-            <p style="font-size:.75rem;color:var(--gr);display:flex;align-items:center;gap:5px;margin:4px 0 0 0;">
-              <span style="width:7px;height:7px;border-radius:50%;background:var(--gr);display:inline-block;" aria-hidden="true"></span> online
-            </p>
-          </div>
-        </header>
-
-        {{-- Histórico de Mensagens --}}
-        <div class="ch-win" aria-live="polite" aria-label="Mensagens" id="chat-win">
-          <template x-for="msg in messages" :key="msg.id">
-            <div class="group relative">
-                <p class="ch-mt" :class="msg.user_id == authId ? 'r' : ''" style="font-size:.65rem;" x-text="msg.user.name + ' · ' + new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})"></p>
-                <div class="flex flex-col" :class="msg.user_id == authId ? 'items-end' : 'items-start'">
-                  <div class="flex items-center gap-2" :class="msg.user_id == authId ? 'flex-row-reverse' : 'flex-row'">
-                    <p class="bub" :class="msg.user_id == authId ? 'bub-sn' : 'bub-rc'" x-text="msg.body"></p>
-                    
-                    {{-- Menu de Opções da Mensagem --}}
-                    <div x-data="{ msgMenu: false }" class="opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button @click="msgMenu = !msgMenu" class="p-1 text-slate-300 hover:text-slate-500">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                        </button>
-                        <div x-show="msgMenu" @click.away="msgMenu = false" x-cloak class="absolute z-10 bg-white border border-gray-100 shadow-xl rounded-lg py-1 w-24 text-[10px]">
-                            <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50 text-slate-600">Editar</button>
-                            <button class="w-full text-left px-3 py-1.5 hover:bg-red-50 text-red-500">Deletar</button>
-                        </div>
-                    </div>
-                  </div>
+        }" x-init="scroll()">
+            <header style="display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--bd);">
+                <img src="{{ $participant?->profile_photo_url }}" alt="{{ $participant?->name }}" style="width:46px;height:46px;border-radius:16px;object-fit:cover;">
+                <div>
+                    <h2 style="font-weight:800;color:var(--tx);">{{ $participant?->name }}</h2>
+                    <p style="color:var(--gr);font-weight:700;font-size:.8rem;">online</p>
                 </div>
+            </header>
+            <div class="chat-messages" x-ref="messages">
+                <template x-for="msg in messages" :key="msg.id">
+                    <div :class="msg.user_id == authId ? 'msg-wrap sent' : 'msg-wrap'" @click.away="openMenu = null">
+                        <p class="msg-meta" x-text="(msg.user?.name || 'Usuário') + ' · ' + new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})"></p>
+                        <template x-if="editingId === msg.id">
+                            <div class="edit-message">
+                                <input x-model="editingBody" @keydown.enter.prevent="saveEdit(msg)" @keydown.escape.prevent="cancelEdit()" type="text">
+                                <button type="button" class="btn btn-primary btn-sm" @click="saveEdit(msg)"><i class="fa-solid fa-check"></i></button>
+                                <button type="button" class="btn btn-ghost btn-sm" @click="cancelEdit()"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </template>
+                        <template x-if="editingId !== msg.id">
+                            <div class="msg-line">
+                                <p class="msg" :class="msg.user_id == authId ? 'sent' : 'received'" x-text="msg.body"></p>
+                                <template x-if="msg.user_id == authId">
+                                    <div style="position:relative;">
+                                        <button type="button" class="dots-btn" @click.stop="openMenu = openMenu === msg.id ? null : msg.id" aria-label="Ações da mensagem"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                                        <div x-show="openMenu === msg.id" x-cloak class="action-menu">
+                                            <button type="button" @click="edit(msg)"><i class="fa-solid fa-pen"></i>Editar</button>
+                                            <button type="button" @click="deleteMessage(msg)"><i class="fa-solid fa-trash"></i>Excluir</button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
             </div>
-          </template>
-          <template x-if="messages.length === 0">
-            <p style="text-align:center;color:var(--mu);padding:20px;font-size:.95rem;">Nenhuma mensagem ainda</p>
-          </template>
-        </div>
-
-        {{-- Formulário de Envio --}}
-        <form @submit.prevent="sendMessage" class="ch-bar" style="gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--bd);display:flex;">
-          <label for="msg-input" class="sr-only">Escrever mensagem</label>
-          <input 
-            x-model="body" 
-            type="text" 
-            id="msg-input" 
-            placeholder="Escreva uma mensagem..." 
-            required 
-            autocomplete="off" 
-            :disabled="sending"
-            style="flex:1;background:var(--sf2);border:1.5px solid var(--bd);border-radius:30px;padding:12px 18px;color:var(--tx);font-family:'Dosis',sans-serif;font-size:.97rem;outline:none;"
-          >
-          <button type="submit" class="btn b-pr bsm" :disabled="sending || !body.trim()" style="padding:10px 18px;font-size:.94rem;">
-            <i class="fa-solid fa-paper-plane" :class="sending ? 'fa-spinner fa-spin' : ''" aria-hidden="true"></i> Enviar
-          </button>
-        </form>
-      </article>
+            <form class="chat-form" @submit.prevent="send">
+                <input x-model="body" type="text" placeholder="Escreva uma mensagem..." autocomplete="off" :disabled="sending">
+                <button class="btn btn-primary" type="submit" :disabled="sending || !body.trim()"><i class="fa-solid fa-paper-plane"></i>Enviar</button>
+            </form>
+        </article>
     @else
-      <article class="card" style="display:flex;align-items:center;justify-content:center;min-height:480px;">
-        <p style="text-align:center;color:var(--mu);font-size:.98rem;">
-          <i class="fa-solid fa-message" style="font-size:2.5rem;margin-bottom:10px;display:block;"></i>
-          Selecione uma conversa para começar
-        </p>
-      </article>
+        <article class="card" style="display:flex;align-items:center;justify-content:center;text-align:center;min-height:620px;">
+            <p style="color:var(--mu);font-weight:700;"><i class="fa-solid fa-message" style="display:block;font-size:2.4rem;margin-bottom:12px;color:var(--in);"></i>Selecione uma conversa para começar.</p>
+        </article>
     @endif
-  </div>
-</main>
+</div>
 
-@if(isset($messages))
-<script>
-  // Auto-scroll para o fim do chat ao carregar
-  const chatWin = document.getElementById('chat-win');
-  if (chatWin) {
-    chatWin.scrollTop = chatWin.scrollHeight;
-  }
-</script>
-@endif
+<template x-teleport="body">
+    <div x-show="editOpen" x-cloak class="std-modal-overlay" @click.self="editOpen=false">
+        <form class="std-modal" method="POST" :action="editAction" role="dialog" aria-modal="true">
+            @csrf
+            @method('PATCH')
+            <h2>Editar conversa</h2>
+            <p>Defina um nome curto para reconhecer esta conversa na lista.</p>
+            <input type="text" name="title" x-model="editTitle" x-ref="conversationTitleInput" maxlength="80" placeholder="Ex.: Retorno pós-consulta">
+            <div class="std-actions">
+                <button type="button" class="btn btn-ghost" @click="editOpen=false">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</template>
 
-<script>
-  // Theme initialization
-  (function(){
-    const t = localStorage.getItem('cl-theme') || 'light';
-    document.documentElement.setAttribute('data-theme', t);
-  @endsection
+<template x-teleport="body">
+    <div x-show="deleteOpen" x-cloak class="std-modal-overlay" @click.self="deleteOpen=false">
+        <form class="std-modal" method="POST" :action="deleteAction" role="dialog" aria-modal="true">
+            @csrf
+            @method('DELETE')
+            <h2>Excluir conversa</h2>
+            <p>Esta conversa e todas as suas mensagens serão removidas permanentemente.</p>
+            <div class="std-actions">
+                <button type="button" class="btn btn-ghost" @click="deleteOpen=false">Cancelar</button>
+                <button type="submit" class="btn btn-danger">Excluir</button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<template x-teleport="body">
+    <div x-show="modalOpen" x-cloak class="std-modal-overlay" @click.self="modalOpen=false">
+        <div class="std-modal" role="dialog" aria-modal="true">
+            <h2 x-text="modalTitle"></h2>
+            <p x-text="modalMessage"></p>
+            <div class="std-actions">
+                <button type="button" class="btn btn-ghost" @click="modalOpen=false">Cancelar</button>
+                <button type="button" class="btn btn-danger" @click="runConfirm()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</template>
+</div>
+@endsection

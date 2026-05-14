@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
-use App\Models\ChatLog; // Usando sua model existente
+use App\Models\ChatLog;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 

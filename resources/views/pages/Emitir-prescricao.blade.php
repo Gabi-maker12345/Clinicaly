@@ -10,7 +10,7 @@
     /* Forçando o fundo e o reset para não herdar o preto do layout original */
     .clinicaly-scope {
         background-color: var(--bg) !important;
-        min-height: 100vh;
+        min-height: calc(100vh - var(--topbar-h, 64px));
         color: var(--tx);
         font-family: 'Dosis', sans-serif;
     }
@@ -19,7 +19,7 @@
         --in:#8b72cc;--il:#a892e0;--is:#1e1838;--id:#2a2050;--bg:#0d0b14;--sf:#161222;--sf2:#1e1830;--sf3:#251f3a;--bd:#2a2245;--tx:#e8e2f5;--mu:#8a7faa;--fa:#4a4268;--gr:#34c98a;--gb:#0d2e20;--gbd:#1a5c3c;--bl:#5b9cf6;--bb:#0d1f3c;--bbd:#1e3a6e;--wn:#f59e0b;--wb:#2e1d00;--wbd:#5c3a00;--rd:#ef4444;--rb:#2e0d0d;--rbd:#5c1a1a;--sh:0 1px 3px rgba(0,0,0,.4);--sh2:0 4px 12px rgba(0,0,0,.5);
     }
     
-    .page{max-width:900px;margin:0 auto;padding:28px 20px 80px;}
+    .page{max-width:1180px;margin:0 auto;padding:0 0 80px;}
     @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     .fi{animation:fi .3s ease both;}.fi1{animation-delay:.05s;}.fi2{animation-delay:.1s;}.fi3{animation-delay:.15s;}
     
@@ -51,12 +51,13 @@
     .mb{background:var(--sf2);border:1.5px solid var(--bd);border-radius:var(--rs);padding:16px;margin-bottom:10px;}
     .mb-nm{font-size:.95rem;font-weight:700;margin-bottom:10px;}
 
-    .search-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.2s; }
-    .search-overlay.active { display: flex; opacity: 1; }
-    .search-modal { background: var(--sf); border: 1px solid var(--bd); border-radius: var(--r); width: 90%; max-width: 500px; padding: 20px; box-shadow: var(--sh2); transform: translateY(20px); transition: transform 0.2s; }
-    .search-overlay.active .search-modal { transform: translateY(0); }
-    .search-results { max-height: 250px; overflow-y: auto; margin-top: 12px; border: 1px solid var(--bd); border-radius: var(--rs); display: none; }
-    .search-result-item { padding: 12px 16px; border-bottom: 1px solid var(--bd); cursor: pointer; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .med-search-wrap{position:relative;margin-bottom:14px}
+    .med-search-wrap i{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--mu);pointer-events:none}
+    .med-search-input{width:100%;border:1.5px solid var(--bd);border-radius:16px;background:var(--sf2);color:var(--tx);padding:12px 40px 12px 15px;font-weight:700;outline:0}
+    .med-search-input:focus{border-color:var(--in);box-shadow:0 0 0 3px rgba(109,85,177,.12);background:var(--sf)}
+    .search-results { position:absolute;z-index:50;left:0;right:0;top:calc(100% + 7px);max-height:260px;overflow-y:auto;border:1px solid var(--bd);background:var(--sf);border-radius:14px;display:none;box-shadow:var(--sh2);scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+    .search-results::-webkit-scrollbar{width:4px}.search-results::-webkit-scrollbar-track{background:transparent}.search-results::-webkit-scrollbar-thumb{background:var(--bd);border-radius:999px}
+    .search-result-item { width:100%;padding:12px 16px;border:0;border-bottom:1px solid var(--bd);background:transparent;color:var(--tx);cursor:pointer;font-weight:700;display:flex;justify-content:space-between;align-items:center;text-align:left; }
     .search-result-item:hover { background: var(--sf2); color: var(--in); }
     
     .dur-wrapper { display: flex; align-items: center; gap: 8px; background: var(--sf2); border: 1.5px solid var(--bd); border-radius: var(--rs); padding: 0 14px; }
@@ -75,22 +76,26 @@
                     <h1 style="font-size:1.55rem;font-weight:800;margin-bottom:4px; color: var(--tx);">Emitir Prescrição</h1>
                     <p style="font-family:'Space Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:var(--mu);"> 
                         {{-- Correção de Relacionamento: user para paciente --}}
-                        {{ $diagnostico->paciente->name }} · {{ $diagnostico->titulo ?? 'Diagnóstico a Confirmar' }}
+                        {{ $diagnostico->paciente->name }} · {{ $diagnostico->confirmed_disease_name ?? 'Diagnóstico a Confirmar' }}
                     </p>
                 </section>
 
                 <section class="fi fi1" style="margin-top:14px;">
                     <div class="al al-gr">
                         <i class="fa-solid fa-circle-check"></i>
-                        <p>Diagnóstico confirmado: <strong>{{ $diagnostico->titulo ?? 'Condição identificada' }}</strong> — defina os medicamentos abaixo</p>
+                        <p>Diagnóstico confirmado: <strong>{{ $diagnostico->confirmed_disease_name ?? 'Condição identificada' }}</strong> — defina os medicamentos abaixo</p>
                     </div>
                 </section>
 
                 <article class="card fi fi1" style="margin-top:14px;">
                     <h2 class="ct"><i class="fa-solid fa-pills"></i> Medicamentos — ajustável</h2>
+                    <div class="med-search-wrap">
+                        <input type="text" id="searchInput" class="med-search-input" placeholder="Pesquisar e adicionar remédio..." autocomplete="off" oninput="searchMedication(this.value)" onfocus="searchMedication(this.value)">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <div class="search-results" id="searchResults"></div>
+                    </div>
                     <div id="medications-container">
                     </div>
-                    <button type="button" class="btn b-gh bsm" onclick="openSearchModal()"><i class="fa-solid fa-plus"></i> Adicionar medicamento</button>
                 </article>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 fi fi2" style="margin-top:14px;">
@@ -100,7 +105,10 @@
                             <span class="av av-bl av-sm">{{ substr($diagnostico->paciente->name, 0, 2) }}</span>
                             <div>
                                 <p style="font-weight:700;">{{ $diagnostico->paciente->name }}</p>
-                                <p style="font-size:.75rem;color:var(--mu);">{{ $diagnostico->paciente->idade ?? 'N/A' }} anos · {{ $diagnostico->paciente->genero ?? 'N/A' }}</p>
+                                <p style="font-size:.75rem;color:var(--mu);">
+                                    {{ $diagnostico->dados_biometricos['idade'] ?? 'N/A' }} anos ·
+                                    {{ ($diagnostico->dados_biometricos['genero'] ?? '') === 'm' ? 'Masculino' : (($diagnostico->dados_biometricos['genero'] ?? '') === 'f' ? 'Feminino' : 'N/A') }}
+                                </p>
                             </div>
                         </div>
                         <div class="fl">
@@ -133,36 +141,9 @@
         </form>
     </div>
 
-    {{-- Modal de Busca --}}
-    <div class="search-overlay clinicaly-scope" id="searchOverlay" onclick="closeSearchModal(event)">
-        <div class="search-modal" onclick="event.stopPropagation()">
-            <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-                <h3 style="font-weight:800; font-size:1.1rem; color: var(--tx);"><i class="fa-solid fa-magnifying-glass" style="color:var(--mu)"></i> Buscar Medicamento</h3>
-                <button type="button" class="tb" style="width:28px;height:28px;" onclick="closeSearchModal(true)"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="fl">
-                <input type="text" id="searchInput" placeholder="Digite o nome do remédio..." autocomplete="off" oninput="searchMedication(this.value)">
-            </div>
-            <div class="search-results" id="searchResults"></div>
-        </div>
-    </div>
-
     @push('scripts')
     <script>
         let medIndex = 0;
-
-        function openSearchModal() {
-            document.getElementById('searchOverlay').classList.add('active');
-            document.getElementById('searchInput').focus();
-        }
-
-        function closeSearchModal(force = false) {
-            if (force || (event && event.target.id === 'searchOverlay')) {
-                document.getElementById('searchOverlay').classList.remove('active');
-                document.getElementById('searchInput').value = '';
-                document.getElementById('searchResults').style.display = 'none';
-            }
-        }
 
         async function searchMedication(query) {
             const resultsDiv = document.getElementById('searchResults');
@@ -176,11 +157,12 @@
                 resultsDiv.innerHTML = '';
                 if (data.length > 0) {
                     data.forEach(med => {
-                        const div = document.createElement('div');
-                        div.className = 'search-result-item';
-                        div.innerHTML = `<span>${med}</span> <i class="fa-solid fa-plus"></i>`;
-                        div.onclick = () => addMedicationBlock(med);
-                        resultsDiv.appendChild(div);
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'search-result-item';
+                        button.innerHTML = `<span>${med}</span> <i class="fa-solid fa-plus"></i>`;
+                        button.onclick = () => addMedicationBlock(med);
+                        resultsDiv.appendChild(button);
                     });
                     resultsDiv.style.display = 'block';
                 } else {
@@ -222,8 +204,15 @@
             </div>`;
             container.insertAdjacentHTML('beforeend', html);
             medIndex++;
-            closeSearchModal(true);
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').style.display = 'none';
         }
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.med-search-wrap')) {
+                document.getElementById('searchResults').style.display = 'none';
+            }
+        });
     </script>
     @endpush
 </x-app-layout>

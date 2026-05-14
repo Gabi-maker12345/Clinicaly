@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\CategoryController;
 use App\Models\Category;
 use App\Models\Disease;
+use App\Models\Medication;
 use App\Models\Symptom;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Diagnostico;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -21,12 +23,135 @@ class DiscoveryController extends Controller
     }
     public function diagnostico() 
     {
+        $symptoms = \App\Models\Symptom::with(['descriptions', 'diseases'])->orderBy('name')->get();
+        $diseases = \App\Models\Disease::with(['categories', 'medications', 'symptoms', 'descriptions'])->get();
+        $categories = \App\Models\Category::with(['descriptions'])->withCount('diseases')->get();
+        $medications = Medication::with(['diseases.categories', 'descriptions'])->orderBy('name')->get();
+
+        $this->appendClinicalSummaries($diseases, 'disease');
+        $this->appendClinicalSummaries($symptoms, 'symptom');
+        $this->appendClinicalSummaries($categories, 'category');
+        $this->appendClinicalSummaries($medications, 'medication');
+
         return view('diagnostico', [
-            'symptoms'   => \App\Models\Symptom::orderBy('name')->get(),
-            'diseases'   => \App\Models\Disease::with('categories')->get(),
-            'categories' => \App\Models\Category::withCount('diseases')->get(),
-            'patients'   => \App\Models\User::where('role', 'pacient')->orderBy('name')->get(),
+            'symptoms'    => $symptoms,
+            'diseases'    => $diseases,
+            'categories'  => $categories,
+            'medications' => $medications,
+            'patients'    => \App\Models\User::where('role', 'pacient')->orderBy('name')->get(),
         ]);
+    }
+
+    private function appendClinicalSummaries($items, string $type): void
+    {
+        $missing = [];
+
+        foreach ($items as $item) {
+            $existingDescription = $item->description
+                ?? $item->descriptions->first()?->content
+                ?? null;
+
+            if ($existingDescription) {
+                $item->setAttribute('brief_description', $existingDescription);
+                continue;
+            }
+
+            $cacheKey = $this->clinicalSummaryCacheKey($type, $item->name);
+            $cached = Cache::get($cacheKey);
+
+            if ($cached) {
+                $item->setAttribute('brief_description', $cached);
+            } else {
+                $missing[$item->name] = $item;
+            }
+        }
+
+        foreach (array_chunk(array_keys($missing), 20) as $names) {
+            $generated = $this->generateClinicalSummariesWithGroq($type, $names);
+
+            foreach ($names as $name) {
+                $summary = $generated[$name] ?? $this->fallbackClinicalSummary($type, $name);
+                Cache::put($this->clinicalSummaryCacheKey($type, $name), $summary, now()->addDays(30));
+                $missing[$name]->setAttribute('brief_description', $summary);
+            }
+        }
+    }
+
+    private function generateClinicalSummariesWithGroq(string $type, array $names): array
+    {
+        $apiKey = config('services.groq.key');
+
+        if (!$apiKey || empty($names)) {
+            return [];
+        }
+
+        $labels = [
+            'disease' => 'doenças',
+            'symptom' => 'sintomas',
+            'category' => 'categorias clínicas',
+            'medication' => 'medicamentos',
+        ];
+
+        $baseUrl = rtrim(config('services.groq.base_url'), '/');
+        $request = Http::timeout((int) config('services.groq.timeout', 30));
+
+        if (!config('services.groq.verify_ssl', true)) {
+            $request = $request->withoutVerifying();
+        }
+
+        try {
+            $response = $request
+                ->withToken($apiKey)
+                ->post($baseUrl . '/chat/completions', [
+                    'model' => config('services.groq.model'),
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Você escreve descrições clínicas curtas em português. Responda apenas com JSON válido: objeto em que cada chave é o nome recebido e cada valor é uma descrição com no máximo 24 palavras. Não use Markdown.'],
+                        ['role' => 'user', 'content' => 'Crie descrições breves para estas ' . ($labels[$type] ?? 'entradas clínicas') . ': ' . json_encode(array_values($names), JSON_UNESCAPED_UNICODE)],
+                    ],
+                    'temperature' => 0.3,
+                    'max_completion_tokens' => 900,
+                ]);
+
+            if (!$response->successful()) {
+                return [];
+            }
+
+            $content = trim($response->json()['choices'][0]['message']['content'] ?? '{}');
+            $decoded = json_decode($content, true);
+
+            if (!is_array($decoded)) {
+                preg_match('/\{[\s\S]*\}/', $content, $matches);
+                $decoded = json_decode($matches[0] ?? '{}', true);
+            }
+
+            return collect($decoded)
+                ->filter(fn ($summary) => is_string($summary) && trim($summary) !== '')
+                ->map(fn ($summary) => trim($summary))
+                ->all();
+        } catch (\Exception $e) {
+            Log::warning('Falha ao gerar descrições clínicas via Groq.', [
+                'type' => $type,
+                'message' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
+
+    private function fallbackClinicalSummary(string $type, string $name): string
+    {
+        return match ($type) {
+            'disease' => "{$name} é uma condição clínica que requer avaliação dos sinais, sintomas, fatores de risco e evolução do paciente.",
+            'symptom' => "{$name} é um achado clínico que deve ser interpretado junto ao contexto, duração, intensidade e sinais associados.",
+            'medication' => "{$name} é um medicamento que deve ser usado conforme indicação clínica, dose adequada e avaliação de contraindicações.",
+            'category' => "{$name} agrupa condições clínicas relacionadas para facilitar pesquisa, triagem e organização da base médica.",
+            default => "{$name} requer análise clínica individualizada.",
+        };
+    }
+
+    private function clinicalSummaryCacheKey(string $type, string $name): string
+    {
+        return 'clinical-summary:' . $type . ':' . md5(mb_strtolower($name));
     }
     
     public function process(Request $request)

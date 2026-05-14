@@ -5,7 +5,6 @@
         [data-theme="dark"] { --tx:#e8e2f5; --mu:#8a7faa; --fa:#4a4268; --sf:#161222; --sf2:#1e1830; --in:#8b72cc; --bg:#0d0b14; }
         
         /* Global dark mode support */
-        h1, h2, h3, p { color: var(--tx) !important; }
         .text-slate-900 { color: var(--tx) !important; }
         .text-slate-800 { color: var(--tx) !important; }
         .text-slate-600 { color: var(--mu) !important; }
@@ -27,8 +26,32 @@
         .dark-mode-text { color: var(--tx); }
         .dark-mode-border { border-color: color-mix(in srgb, var(--tx) 10%, transparent); }
         .dark-mode-secondary { background-color: var(--sf2); color: var(--mu); }
+        .validation-page{position:relative;max-width:none!important;width:100%;padding:34px 36px 80px;background:
+            radial-gradient(circle at 86% 2%, color-mix(in srgb,var(--in) 14%,transparent), transparent 30%),
+            linear-gradient(color-mix(in srgb,var(--in) 4%,transparent) 1px, transparent 1px),
+            linear-gradient(90deg,color-mix(in srgb,var(--in) 4%,transparent) 1px, transparent 1px),
+            var(--bg);background-size:auto,44px 44px,44px 44px,auto}
+        .validation-page>section,.validation-page>div,.validation-page>form{width:min(1180px,100%);margin-left:auto;margin-right:auto}
+        .validation-page h1{font-size:2rem!important;font-weight:800!important;letter-spacing:0;color:var(--tx)!important}
+        .validation-page h1 span{background:linear-gradient(135deg,var(--in),#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .validation-page .rounded-\[35px\]{border-radius:18px!important}
+        .validation-page article,.validation-page section.rounded-\[35px\]{position:relative;overflow:hidden;background:linear-gradient(180deg,var(--sf),color-mix(in srgb,var(--sf2) 70%,var(--sf)))!important;border:1px solid color-mix(in srgb,var(--in) 14%,var(--sf2))!important;box-shadow:0 10px 30px rgba(109,85,177,.08)!important}
+        .validation-page article:hover,.validation-page section.rounded-\[35px\]:hover{box-shadow:0 14px 38px rgba(109,85,177,.13)!important;border-color:color-mix(in srgb,var(--in) 28%,var(--sf2))!important}
+        .validation-page h2{color:var(--in)!important;padding-bottom:12px;border-bottom:1px solid color-mix(in srgb,var(--tx) 10%,transparent)}
+        .validation-page .w-16.h-16{background:linear-gradient(135deg,var(--in),#8b72cc)!important;color:#fff!important;border:0!important;box-shadow:0 10px 28px rgba(109,85,177,.22)}
+        .validation-page .bg-slate-50.border{background:var(--sf2)!important;border-color:color-mix(in srgb,var(--tx) 10%,transparent)!important;color:var(--tx)!important;border-radius:999px!important}
+        .validation-page .h-2.bg-slate-50{height:8px!important;background:color-mix(in srgb,var(--in) 10%,var(--sf2))!important;border:1px solid color-mix(in srgb,var(--in) 12%,transparent)}
+        .validation-page .h-full.bg-\[\#6d55b1\]{background:linear-gradient(90deg,var(--in),#8b72cc)!important}
+        .validation-page a.rounded-\[25px\]{background:var(--sf2)!important;border:1px solid color-mix(in srgb,var(--tx) 10%,transparent)!important;border-radius:14px!important}
+        .validation-page a.rounded-\[25px\]:hover{border-color:var(--in)!important;box-shadow:0 10px 28px rgba(109,85,177,.12)}
+        .validation-page label{font-family:'Space Mono',monospace!important;color:var(--mu)!important}
+        .validation-page select,.validation-page textarea{border:1.5px solid color-mix(in srgb,var(--tx) 10%,transparent)!important;background:var(--sf2)!important;color:var(--tx)!important;border-radius:14px!important;box-shadow:none!important}
+        .validation-page select:focus,.validation-page textarea:focus{border-color:var(--in)!important;box-shadow:0 0 0 3px rgba(109,85,177,.14)!important}
+        .validation-page form>.flex.flex-wrap{width:min(1180px,100%);margin-left:auto;margin-right:auto}
+        .validation-page form>.flex.flex-wrap button{border-radius:999px!important}
+        @media(max-width:768px){.validation-page{padding:24px 16px 60px}.validation-page form>.flex.flex-wrap button{width:100%}}
     </style>
-    <main class="mt-12 max-w-5xl mx-auto px-6 pb-20" x-data="{ showRejectModal: false }" style="background: var(--bg); color: var(--tx);">
+    <main class="validation-page max-w-5xl mx-auto pb-20" x-data="{ showRejectModal: false }" style="background: var(--bg); color: var(--tx);">
         <section class="mb-8">
             <header class="mb-4 flex justify-between items-center">
                 <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-600 border border-emerald-200">Revisão Clínica</span>
@@ -48,11 +71,11 @@
 
         @if($topProb > 80)
         <section class="mb-8">
-            <div class="bg-red-50 border border-red-100 rounded-[30px] p-6 flex items-center gap-4" style="background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.3);">
+            <div class="bg-red-50 border border-red-100 rounded-[30px] p-6 flex items-center gap-4" style="background: var(--rb); border-color: var(--rbd); color: var(--rd);">
                 <div class="bg-red-500 text-white w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-red-200">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
-                <p class="text-red-900 font-medium text-sm">Gravidade classificada como <strong>CRÍTICA ({{ $topProb }}%)</strong> — reveja os dados antes de confirmar.</p>
+                <p class="font-medium text-sm" style="color:var(--rd);">Gravidade classificada como <strong>CRÍTICA ({{ $topProb }}%)</strong> — reveja os dados antes de confirmar.</p>
             </div>
         </section>
         @endif
@@ -92,8 +115,8 @@
             </article>
 
             {{-- SCORES DA IA --}}
-            <article class=\"rounded-[35px] p-8 border shadow-sm dark-mode-compatible\" style=\"background: var(--sf); border-color: color-mix(in srgb, var(--tx) 10%, transparent);\">
-                <h2 class=\"text-[10px] font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-2\" style=\"color: var(--mu);\">
+            <article class="rounded-[35px] p-8 border shadow-sm dark-mode-compatible" style="background: var(--sf); border-color: color-mix(in srgb, var(--tx) 10%, transparent);">
+                <h2 class="text-[10px] font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-2" style="color: var(--mu);">
                     <i class="fa-solid fa-robot"></i> Análise Probabilística
                 </h2>
                 <div class="space-y-6">
@@ -114,8 +137,8 @@
         </div>
 
         {{-- FONTES DO GEMINI --}}
-        <section class=\"rounded-[35px] p-8 border shadow-sm mb-8 dark-mode-compatible\" style=\"background: var(--sf); border-color: color-mix(in srgb, var(--tx) 10%, transparent);\">
-            <h2 class=\"text-[10px] font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-2\" style=\"color: var(--mu);\">
+        <section class="rounded-[35px] p-8 border shadow-sm mb-8 dark-mode-compatible" style="background: var(--sf); border-color: color-mix(in srgb, var(--tx) 10%, transparent);">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-2" style="color: var(--mu);">
                 <i class="fa-solid fa-book-medical"></i> Referências Médicas (IA Gemini)
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -134,10 +157,10 @@
         </section>
 
         {{-- FORMULÁRIO DE DECISÃO --}}
-        <form action="{{ route('diagnostico.confirmar', $diagnostico->id) }}" method="POST">
+        <form id="confirmDiagnosisForm" action="{{ route('diagnostico.confirmar', $diagnostico->id) }}" method="POST">
             @csrf
-            <article class=\"rounded-[35px] p-8 border shadow-sm mb-8 dark-mode-compatible\" style=\"background: var(--sf); border-color: color-mix(in srgb, var(--tx) 10%, transparent);\">
-                <h2 class=\"text-[10px] font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-2\" style=\"color: var(--mu);\">
+            <article class="rounded-[35px] p-8 border shadow-sm mb-8 dark-mode-compatible" style="background: var(--sf); border-color: color-mix(in srgb, var(--tx) 10%, transparent);">
+                <h2 class="text-[10px] font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-2" style="color: var(--mu);">
                     <i class="fa-solid fa-stethoscope"></i> Parecer Médico
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -170,17 +193,17 @@
                     Rejeitar Caso
                 </button>
                 
-                <form action="{{ route('messages.start', $diagnostico->id_paciente) }}" method="POST" class="inline-block">
-                    @csrf
-                    <button type="submit" class="px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all dark-mode-secondary" style="background: var(--sf2); color: var(--mu);">
-                        Contactar Paciente
-                    </button>
-                </form>
+                <button type="submit" form="contactPatientForm" class="px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all dark-mode-secondary" style="background: var(--sf2); color: var(--mu);">
+                    Contactar Paciente
+                </button>
 
                 <button type="submit" class="px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-[#6d55b1] text-white shadow-lg shadow-purple-100 hover:scale-105 transition-transform">
                     Validar e Emitir Prescrição
                 </button>
             </div>
+        </form>
+        <form id="contactPatientForm" action="{{ route('messages.start', $diagnostico->id_paciente) }}" method="POST" style="display:none;">
+            @csrf
         </form>
 
         {{-- MODAL DE REJEIÇÃO (DELETE) --}}

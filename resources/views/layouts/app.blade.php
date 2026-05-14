@@ -1,192 +1,173 @@
+@php
+    $authUser = auth()->user();
+    $role = $authUser?->role ?? 'pacient';
+    $isDoctor = in_array($role, ['doctor', 'medico', 'médico'], true);
+    $roleLabel = $isDoctor ? 'Médico' : 'Paciente';
+    $pendingCount = 0;
+    $notificationCount = 0;
+
+    try {
+        $pendingCount = $isDoctor && class_exists(\App\Models\Diagnostico::class)
+            ? \App\Models\Diagnostico::where('status', 'pendente')->count()
+            : 0;
+
+        $messageCount = class_exists(\App\Models\Message::class)
+            ? \App\Models\Message::where('user_id', '!=', $authUser?->id)
+                ->where('read', false)
+                ->whereHas('conversation', function ($query) use ($authUser) {
+                    $query->where('sender_id', $authUser?->id)
+                        ->orWhere('receiver_id', $authUser?->id);
+                })
+                ->count()
+            : 0;
+
+        $notificationCount = (int) ($authUser?->unreadNotifications()?->count() ?? 0) + $messageCount;
+    } catch (\Throwable $e) {
+        $pendingCount = 0;
+        $notificationCount = 0;
+    }
+@endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ config('app.name', 'Clinicaly') }}</title>
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600|dosis:400,500,600,700,800|space-mono:400,700&display=swap" rel="stylesheet" />
-        
-        <!-- Tailwind via CDN com Configuração para a fonte Dosis -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                darkMode: 'class',
-                theme: {
-                    extend: {
-                        fontFamily: {
-                            sans: ['Dosis', 'ui-sans-serif', 'system-ui'],
-                            dosis: ['Dosis', 'sans-serif'],
-                            mono: ['Space Mono', 'monospace'],
-                        },
-                        colors: {
-                            indigo: { 500: '#735ab8', 600: '#6d55b1', 700: '#58448f' },
-                        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Dosis', 'ui-sans-serif', 'system-ui'],
+                        dosis: ['Dosis', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
                     }
                 }
             }
-        </script>
+        };
+    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="{{ asset('logo-clin.ico') }}" type="image/x-icon">
+    @livewireStyles
+    @stack('styles')
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        :root{--in:#6d55b1;--il:#8b72cc;--is:#f5f3fd;--id:#ede9f8;--bg:#f2f0fa;--sf:#ffffff;--sf2:#f8f6fd;--sf3:#ede9f8;--bd:#ddd8f0;--bd2:#ccc4e8;--tx:#1a1530;--mu:#7c72a0;--fa:#b0a8cc;--gr:#059669;--gb:#ecfdf5;--gbd:#a7f3d0;--bl:#3b82f6;--bb:#eff6ff;--bbd:#bfdbfe;--wn:#d97706;--wb:#fffbeb;--wbd:#fcd34d;--rd:#dc2626;--rb:#fef2f2;--rbd:#fca5a5;--sh:0 1px 3px rgba(109,85,177,.08);--sh2:0 4px 12px rgba(109,85,177,.10);--sh3:0 8px 32px rgba(109,85,177,.14);--r:16px;--rs:8px;--sidebar-w:248px;--topbar-h:64px;}
+        [data-theme="dark"]{--in:#8b72cc;--il:#a892e0;--is:#1e1838;--id:#2a2050;--bg:#0d0b14;--sf:#161222;--sf2:#1e1830;--sf3:#251f3a;--bd:#2a2245;--bd2:#352b58;--tx:#e8e2f5;--mu:#8a7faa;--fa:#4a4268;--gr:#34c98a;--gb:#0d2e20;--gbd:#1a5c3c;--bl:#5b9cf6;--bb:#0d1f3c;--bbd:#1e3a6e;--wn:#f59e0b;--wb:#2e1d00;--wbd:#5c3a00;--rd:#ef4444;--rb:#2e0d0d;--rbd:#5c1a1a;--sh:0 1px 3px rgba(0,0,0,.4);--sh2:0 4px 12px rgba(0,0,0,.5);--sh3:0 8px 32px rgba(0,0,0,.7);}
+        *{box-sizing:border-box} html{background:var(--bg);color:var(--tx)} body{margin:0;min-height:100vh;background:var(--bg);color:var(--tx);font-family:'Dosis',sans-serif;letter-spacing:0} a{color:inherit} [x-cloak]{display:none!important}
+        .app-topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;background:var(--sf);border-bottom:1px solid var(--bd);box-shadow:var(--sh);display:flex;align-items:center;gap:12px;padding:0 20px}
+        .app-logo{display:flex;align-items:center;gap:8px;min-width:180px;text-decoration:none}.app-logo img{width:158px;max-height:44px;object-fit:contain}.hamb{display:none;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;width:38px;height:38px;color:var(--mu)}
+        .app-search{flex:1;max-width:520px;position:relative}.app-search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--mu);font-size:.85rem}.app-search input{width:100%;height:38px;border-radius:30px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);padding:0 16px 0 36px;font:600 .88rem 'Dosis',sans-serif;outline:none}.app-search input:focus{border-color:var(--in);box-shadow:0 0 0 3px rgba(109,85,177,.12);background:var(--sf)}
+        .top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}.icon-btn,.theme-ui{width:38px;height:38px;border-radius:10px;border:1px solid var(--bd);background:var(--sf2);color:var(--mu);display:inline-flex;align-items:center;justify-content:center;position:relative;cursor:pointer;text-decoration:none}.icon-btn:hover,.theme-ui:hover{border-color:var(--bd2,var(--bd));color:var(--in);background:var(--is)}.notify-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--rd);border:2px solid var(--sf);animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+        #theme-toggle{position:absolute;opacity:0;pointer-events:none}.theme-ui .sun{display:none}[data-theme="dark"] .theme-ui .sun{display:block}[data-theme="dark"] .theme-ui .moon{display:none}
+        .user-chip{display:flex;align-items:center;gap:10px;padding:5px 8px;border:1px solid var(--bd);border-radius:999px;background:var(--sf2);min-width:0}.user-chip img{width:34px;height:34px;border-radius:50%;object-fit:cover}.user-meta{line-height:1.05}.user-meta strong{display:block;color:var(--tx);font-size:.86rem;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.user-meta span{display:block;margin-top:3px;color:var(--in);font:700 .58rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
+        .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(10,8,20,.4);backdrop-filter:blur(2px);z-index:89}.app-sidebar{position:fixed;top:var(--topbar-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--sf);border-right:1px solid var(--bd);z-index:90;display:flex!important;flex-direction:column;overflow-y:auto;padding:20px 14px 24px;transition:transform .28s;scrollbar-width:none;-ms-overflow-style:none}.app-sidebar::-webkit-scrollbar{width:0;height:0;display:none}.side-profile{display:flex;align-items:center;gap:10px;padding:12px;background:var(--sf2);border:1px solid var(--bd);border-radius:12px;margin-bottom:16px}.side-profile img{width:38px;height:38px;border-radius:50%;object-fit:cover}.side-profile strong{display:block;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.side-profile span{color:var(--mu);font:700 .48rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.1em}
+        .sn{padding:0 0 8px}.sn-title{display:block;padding:14px 12px 5px;color:var(--fa);font:700 .48rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.14em}.sn a{display:flex;align-items:center;gap:10px;min-height:40px;padding:9px 12px;border-radius:10px;color:var(--mu);text-decoration:none;font-size:.88rem;font-weight:600}.sn a i{width:30px;height:30px;border-radius:8px;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.82rem}.sn a:hover,.sn a.active{background:var(--is);color:var(--in);font-weight:700}.sn a:hover i,.sn a.active i{background:var(--id)}.nav-badge{margin-left:auto;color:#fff;background:var(--rd);font:800 .52rem 'Space Mono',monospace;padding:2px 8px;border-radius:20px}
+        .app-main{padding-top:var(--topbar-h);margin-left:var(--sidebar-w);min-height:100vh}.content-wrap{width:100%;max-width:none;margin:0;padding:32px 36px 80px}
+        .card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--sh);padding:24px}.tag,.tg{display:inline-flex;align-items:center;gap:6px;border-radius:999px;border:1px solid var(--bd);background:var(--sf2);color:var(--mu);font:700 .68rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.08em;padding:5px 11px}.tag.success,.tag-green,.tg-gr{background:var(--gb);color:var(--gr);border-color:var(--gbd)}.tag.danger,.tag-red,.tg-rd{background:var(--rb);color:var(--rd);border-color:var(--rbd)}.tag.warn,.tag-amber,.tg-am{background:var(--wb);color:var(--wn);border-color:var(--wbd)}.tag.info,.tag-purple,.tg-pu{background:var(--is);color:var(--in);border-color:var(--id)}.tag-blue{background:var(--bb);color:var(--bl);border-color:var(--bbd)}.tag-grey{background:var(--sf2);color:var(--mu);border-color:var(--bd)}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;border:1.5px solid transparent;padding:10px 18px;font:800 .9rem 'Dosis',sans-serif;text-decoration:none;cursor:pointer;transition:.18s;white-space:nowrap}.btn-primary,.b-pr{background:var(--in);color:#fff}.btn-primary:hover,.b-pr:hover{background:var(--il)}.btn-ghost,.b-gh{background:var(--sf2);color:var(--mu);border-color:var(--bd)}.btn-ghost:hover,.b-gh:hover{background:var(--is);color:var(--in);border-color:var(--in)}.btn-danger,.btn-red,.b-rd{background:var(--rb);color:var(--rd);border-color:var(--rbd)}.btn-danger:hover,.btn-red:hover,.b-rd:hover{background:var(--rd);color:#fff}.btn-green{background:var(--gb);color:var(--gr);border-color:var(--gbd)}.btn-green:hover{background:var(--gr);color:#fff}.btn-blue{background:var(--bb);color:var(--bl);border-color:var(--bbd)}.btn-sm,.bsm{padding:7px 13px;font-size:.8rem}.btn-xs{padding:5px 11px;font-size:.74rem}
+        .kpi-card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:22px;box-shadow:var(--sh)}.kpi-card .value{font-size:2rem;font-weight:800;line-height:1;color:var(--in)}.kpi-card .label{margin-top:8px;color:var(--mu);font:700 .68rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.1em}
+        .patient-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 0;border-bottom:1px solid var(--bd)}.patient-row:last-child{border-bottom:0}.data-table{width:100%;border-collapse:separate;border-spacing:0}.data-table th{color:var(--mu);font:700 .65rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.1em;text-align:left;padding:12px;border-bottom:1px solid var(--bd)}.data-table td{padding:14px 12px;border-bottom:1px solid var(--bd);color:var(--tx)}.feed-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--bd)}.progress-bar{height:8px;background:var(--id);border-radius:999px;overflow:hidden}.progress-bar span,.progress-bar div{display:block;height:100%;background:linear-gradient(90deg,var(--in),var(--il));border-radius:inherit}.alert{display:flex;align-items:center;gap:12px;border-radius:16px;padding:15px 18px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx)}.alert.success{background:var(--gb);border-color:var(--gbd);color:var(--gr)}.alert.warning{background:var(--wb);border-color:var(--wbd);color:var(--wn)}.alert.danger{background:var(--rb);border-color:var(--rbd);color:var(--rd)}
+        input,textarea,select{background:var(--sf2);color:var(--tx);border-color:var(--bd)}::placeholder{color:var(--mu);opacity:.75}
+        @media(min-width:768px){.app-topbar{padding-left:20px}.app-sidebar{transform:none!important}.sidebar-overlay{display:none!important}}
+        @media(max-width:767px){.hamb{display:inline-flex;align-items:center;justify-content:center}.app-logo{min-width:auto}.app-logo img{width:128px}.app-search{display:none}.user-meta{display:none}.app-sidebar{transform:translateX(-100%)}.app-main{margin-left:0}.content-wrap{padding:24px 16px 56px}body.sidebar-open .app-sidebar{transform:translateX(0);box-shadow:var(--sh3)}body.sidebar-open .sidebar-overlay{display:block}.top-actions{gap:6px}}
+    </style>
+</head>
+<body>
+    <x-banner />
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-        <!-- Styles -->
-        @stack('styles')
-        @livewireStyles
-        <link rel="icon" href="/logo-clin.ico" type="image/x-icon">
-        <style>
-            * { box-sizing: border-box; }
-            body { font-family: 'Dosis', sans-serif; }
-            :root{--in:#6d55b1;--il:#8b72cc;--is:#f5f3fd;--id:#ede9f8;--bg:#f4f2fb;--sf:#fff;--sf2:#f8f6fd;--sf3:#ede9f8;--bd:#ddd8f0;--tx:#1a1530;--mu:#7c72a0;--fa:#b0a8cc;--gr:#059669;--gb:#ecfdf5;--gbd:#a7f3d0;--bl:#3b82f6;--bb:#eff6ff;--bbd:#bfdbfe;--wn:#d97706;--wb:#fffbeb;--wbd:#fcd34d;--rd:#dc2626;--rb:#fef2f2;--rbd:#fca5a5;--sh:0 1px 3px rgba(109,85,177,.08);--sh2:0 4px 12px rgba(109,85,177,.10);--r:14px;--rs:8px;}
-            [data-theme=dark]{--in:#8b72cc;--il:#a892e0;--is:#1e1838;--id:#2a2050;--bg:#0d0b14;--sf:#161222;--sf2:#1e1830;--sf3:#251f3a;--bd:#2a2245;--tx:#e8e2f5;--mu:#8a7faa;--fa:#4a4268;--gr:#34c98a;--gb:#0d2e20;--gbd:#1a5c3c;--bl:#5b9cf6;--bb:#0d1f3c;--bbd:#1e3a6e;--wn:#f59e0b;--wb:#2e1d00;--wbd:#5c3a00;--rd:#ef4444;--rb:#2e0d0d;--rbd:#5c1a1a;--sh:0 1px 3px rgba(0,0,0,.4);--sh2:0 4px 12px rgba(0,0,0,.5);}
-            html[data-theme] { background-color: var(--bg); color: var(--tx); }
-            .topbar{position:sticky;top:0;z-index:50;background:var(--sf);border-bottom:1px solid var(--bd);box-shadow:var(--sh);display:flex;align-items:center;gap:12px;padding:0 24px;height:60px;}
-            .logo{text-decoration:none;display:flex;align-items:center;height:100%;}
-            .vid{font-family:'Space Mono',monospace;font-size:.55rem;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;}
-            .ib{background:transparent;border:1.5px solid var(--bd);border-radius:50%;width:36px;height:36px;cursor:pointer;color:var(--mu);display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .2s;position:relative;}
-            .ib:hover{border-color:var(--in);color:var(--in);background:var(--is);}
-            .nd{position:absolute;top:-1px;right:-1px;width:8px;height:8px;border-radius:50%;background:var(--rd);border:2px solid var(--sf);}
-            .tb{background:var(--sf2);border:1.5px solid var(--bd);border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:.85rem;transition:all .2s;}
-            .tb:hover{border-color:var(--in);color:var(--in);}
-            .av{display:flex;align-items:center;justify-content:center;font-weight:700;border-radius:50%;flex-shrink:0;width:36px;height:36px;font-size:.78rem;}
-            .av-gr{background:var(--gb);color:var(--gr);border:1.5px solid var(--gbd);}
-            .av-bl{background:var(--bb);color:var(--bl);border:1.5px solid var(--bbd);}
-        </style>
-    </head>
-    <body class="font-sans antialiased" data-theme="light" style="transition: background-color 0.3s ease, color 0.3s ease;">
-        <x-banner />
-
-        <header class="topbar" role="banner">
-            <a href="{{ route('dashboard') }}" class="logo" title="Voltar ao início">
-                <img src="{{ asset('Proosta-logo4.png') }}" alt="Logo" width="180px" class="w-32 md:w-44">
+    <header class="app-topbar">
+        <button type="button" class="hamb" id="sidebar-open" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+        <a href="{{ route('profile.show') }}#dashboard" class="app-logo" title="Clinicaly">
+            <img src="{{ asset('Proosta-logo4.png') }}" alt="Clinicaly">
+        </a>
+        <form class="app-search" role="search" action="{{ route('messages.index') }}" method="GET">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input type="search" name="q" placeholder="Buscar pacientes, conversas e registros">
+        </form>
+        <nav class="top-actions" aria-label="Ações globais">
+            <a href="{{ route('messages.index') }}" class="icon-btn" aria-label="Conversas"><i class="fa-solid fa-comment-dots"></i></a>
+            <a href="{{ route('notifications.index') }}" class="icon-btn {{ request()->routeIs('notifications.*') ? 'active' : '' }}" aria-label="Notificações"><i class="fa-solid fa-bell"></i>@if($notificationCount)<span class="notify-dot"></span>@endif</a>
+            <input type="checkbox" id="theme-toggle" aria-label="Alternar tema">
+            <label for="theme-toggle" class="theme-ui" title="Alternar tema"><i class="fa-solid fa-moon moon"></i><i class="fa-solid fa-sun sun"></i></label>
+            <a href="{{ route('profile.show') }}#profile" class="user-chip">
+                <img src="{{ $authUser?->profile_photo_url }}" alt="{{ $authUser?->name }}">
+                <span class="user-meta"><strong>{{ $authUser?->name }}</strong><span>{{ $roleLabel }}</span></span>
             </a>
+        </nav>
+    </header>
 
-            <nav style="display:flex;align-items:center;gap:8px;margin-left:auto;" aria-label="Acções globais">
-                <ul style="list-style:none;display:flex;align-items:center;gap:8px;">
-                    <li>
-                        <a href="{{ route('messages.index') }}" class="ib" aria-label="Mensagens" title="Conversas">
-                            <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
-                            <span class="nd"></span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <button class="ib" aria-label="Notificações" title="Notificações">
-                            <i class="fa-solid fa-bell" aria-hidden="true"></i>
-                        </button>
-                    </li>
-
-                    <li>
-                        <button class="tb" id="tb" onclick="toggleTheme()" aria-label="Alternar tema" title="Alternar tema">
-                            <i class="fa-solid fa-moon" id="ti" aria-hidden="true"></i>
-                        </button>
-                    </li>
-
-                    <li>
-                        <div class="relative">
-                            <x-dropdown align="right" width="48">
-                                <x-slot name="trigger">
-                                    <button style="display:flex;align-items:center;gap:6px;padding:4px;border-radius:8px;background:transparent;border:1px solid var(--bd);cursor:pointer;transition:all .2s;" class="hover:border-violet-400">
-                                        <img class="w-8 h-8 rounded object-cover border border-gray-200" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" title="{{ Auth::user()->name }}">
-                                        <div style="text-align:left;display:none;" class="sm:block">
-                                            <p style="font-size:.75rem;font-weight:700;color:var(--tx);line-height:1;">{{ Auth::user()->name }}</p>
-                                            <p style="font-size:.65rem;color:var(--in);font-weight:600;margin-top:2px;text-transform:uppercase;">{{ auth()->user()->role === 'doctor' ? 'Médico' : 'Paciente' }}</p>
-                                        </div>
-                                        <i class="fa-solid fa-chevron-down text-[10px]" style="color:var(--mu);"></i>
-                                    </button>
-                                </x-slot>
-
-                                <x-slot name="content">
-                                    <div style="display:block;padding:8px 16px;font-size:.7rem;color:var(--mu);text-transform:uppercase;font-weight:700;letter-spacing:.08em;">
-                                        Gerenciar Conta
-                                    </div>
-
-                                    <x-dropdown-link href="{{ route('profile.show') }}">
-                                        <i class="fa-solid fa-user-gear mr-2"></i> {{ __('Meu Perfil') }}
-                                    </x-dropdown-link>
-
-                                    <div style="border-top:1px solid var(--bd);"></div>
-
-                                    <form method="POST" action="{{ route('logout') }}" x-data>
-                                        @csrf
-                                        <x-dropdown-link href="{{ route('logout') }}"
-                                                        @click.prevent="$root.submit();"
-                                                        style="color:var(--rd);">
-                                            <i class="fa-solid fa-right-from-bracket mr-2"></i> {{ __('Sair') }}
-                                        </x-dropdown-link>
-                                    </form>
-                                </x-slot>
-                            </x-dropdown>
-                        </div>
-                    </li>
-                </ul>
-            </nav>
-        </header>
-
-        <div>
-            <!-- Page Content -->
-
-            <!-- Page Content -->
-            <main>
-                @yield('content')
-                {{ $slot ?? '' }}
-            </main>
+    <button class="sidebar-overlay" id="sidebar-close" type="button" aria-label="Fechar menu"></button>
+    <aside class="app-sidebar" aria-label="Navegação principal">
+        <div class="side-profile">
+            <img src="{{ $authUser?->profile_photo_url }}" alt="{{ $authUser?->name }}">
+            <div><strong>{{ $authUser?->name }}</strong><span>{{ $roleLabel }}</span></div>
         </div>
-        @stack('scripts')
-        @stack('modals')
+        <nav class="sn">
+            <span class="sn-title">Principal</span>
+            <a href="{{ route('profile.show') }}#dashboard"><i class="fa-solid fa-table-cells-large"></i>Dashboard</a>
+            @if($isDoctor)
+                <a href="{{ route('profile.show') }}#fila"><i class="fa-solid fa-list-check"></i>Fila de Validação @if($pendingCount)<span class="nav-badge">{{ $pendingCount }}</span>@endif</a>
+            @endif
+            <a href="{{ route('profile.show') }}#agenda"><i class="fa-solid fa-calendar-days"></i>Agenda</a>
+            @if($isDoctor)
+                <a href="{{ route('profile.show') }}#patients"><i class="fa-solid fa-users"></i>Pacientes</a>
+            @endif
+            <a href="{{ route('profile.show') }}#prescricoes"><i class="fa-solid fa-file-prescription"></i>Prescrições</a>
+            <a href="{{ route('messages.index') }}" class="{{ request()->routeIs('messages.*') ? 'active' : '' }}"><i class="fa-solid fa-comments"></i>Minhas Conversas</a>
+        </nav>
+        <nav class="sn">
+            <span class="sn-title">Análise</span>
+            <a href="{{ route('profile.show') }}#analise1"><i class="fa-solid fa-chart-simple"></i>Estatísticas</a>
+            <a href="{{ route('profile.show') }}#analise2"><i class="fa-solid fa-chart-pie"></i>Relatórios</a>
+            <a href="{{ route('notifications.index') }}" class="{{ request()->routeIs('notifications.*') ? 'active' : '' }}"><i class="fa-solid fa-bell"></i>Notificações @if($notificationCount)<span class="nav-badge">{{ $notificationCount }}</span>@endif</a>
+        </nav>
+        <nav class="sn">
+            <span class="sn-title">Perfil</span>
+            <a href="{{ route('profile.show') }}#profile"><i class="fa-solid fa-user"></i>Meu Perfil</a>
+            <a href="{{ route('profile.show') }}#settings"><i class="fa-solid fa-gear"></i>Configurações</a>
+        </nav>
+        <form method="POST" action="{{ route('logout') }}" style="padding:16px 12px;margin-top:auto;">
+            @csrf
+            <button type="submit" class="btn btn-danger" style="width:100%;"><i class="fa-solid fa-right-from-bracket"></i>Sair</button>
+        </form>
+    </aside>
 
-        @livewireScripts
+    <main class="app-main">
+        <div class="content-wrap">
+            @yield('content')
+            {{ $slot ?? '' }}
+        </div>
+    </main>
 
-        <!-- Alpine.js CDN - Garantir que está carregado -->
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-        <script>
-            // ============================================
-            // SISTEMA UNIVERSAL DE MODO ESCURO - CLINICALY
-            // ============================================
-            // Chave de armazenamento
-            const THEME_KEY = 'cl-theme';
-            
-            // Inicialização do tema antes do DOM renderizar
-            (function(){
-                const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                updateThemeIcon(savedTheme);
-            })();
-
-            // Função para atualizar o ícone do tema
-            function updateThemeIcon(theme){
-                const icon = document.getElementById('ti');
-                if(icon) {
-                    icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-                }
-            }
-
-            // Função para alternar o tema (chamada pelo botão do topbar)
-            function toggleTheme(){
-                const current = document.documentElement.getAttribute('data-theme') || 'light';
-                const next = current === 'light' ? 'dark' : 'light';
-                
-                document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem(THEME_KEY, next);
-                updateThemeIcon(next);
-                
-                // Dispara evento customizado para outras views
-                window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: next } }));
-            }
-
-            // Garante que o tema seja aplicado quando a página volta do cache
-            window.addEventListener('pageshow', function(){
-                const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                updateThemeIcon(savedTheme);
-            });
-        </script>
-    </body>
+    @stack('modals')
+    @livewireScripts
+    @stack('scripts')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        (function () {
+            const key = 'cl-theme';
+            const root = document.documentElement;
+            const toggle = document.getElementById('theme-toggle');
+            const setTheme = (theme) => {
+                root.setAttribute('data-theme', theme);
+                localStorage.setItem(key, theme);
+                if (toggle) toggle.checked = theme === 'dark';
+            };
+            setTheme(localStorage.getItem(key) || 'light');
+            toggle?.addEventListener('change', () => setTheme(toggle.checked ? 'dark' : 'light'));
+            document.getElementById('sidebar-open')?.addEventListener('click', () => document.body.classList.add('sidebar-open'));
+            document.getElementById('sidebar-close')?.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
+            window.addEventListener('pageshow', () => setTheme(localStorage.getItem(key) || 'light'));
+        })();
+    </script>
+</body>
 </html>

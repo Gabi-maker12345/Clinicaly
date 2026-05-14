@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 
 class MessageController extends Controller
 {
@@ -26,7 +25,6 @@ class MessageController extends Controller
 
     public function show(Conversation $conversation)
     {
-        // Usamos != para evitar problemas de tipos entre String e Integer
         if ($conversation->sender_id != Auth::id() && $conversation->receiver_id != Auth::id()) {
             abort(403, 'Você não tem permissão para ver esta conversa.');
         }
@@ -38,7 +36,6 @@ class MessageController extends Controller
             ->where('read', false)
             ->update(['read' => true]);
 
-        // Precisamos carregar a lista lateral também para a view show
         $conversations = Conversation::where('sender_id', Auth::id())
             ->orWhere('receiver_id', Auth::id())
             ->with(['sender', 'receiver', 'messages' => function($query) {
@@ -77,6 +74,75 @@ class MessageController extends Controller
         return back()->with('success', 'Mensagem enviada.');
     }
 
+    public function update(Request $request, Message $message)
+    {
+        if ($message->user_id != Auth::id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'body' => 'required|string|max:2000',
+        ]);
+
+        $message->update([
+            'body' => $request->body,
+        ]);
+
+        $message->conversation?->touch();
+
+        if ($request->expectsJson()) {
+            return response()->json($message->fresh()->load('user'));
+        }
+
+        return back()->with('success', 'Mensagem atualizada.');
+    }
+
+    public function destroy(Request $request, Message $message)
+    {
+        if ($message->user_id != Auth::id()) {
+            abort(403);
+        }
+
+        $conversation = $message->conversation;
+        $message->delete();
+        $conversation?->touch();
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Mensagem excluída.']);
+        }
+
+        return back()->with('success', 'Mensagem excluída.');
+    }
+
+    public function destroyConversation(Conversation $conversation)
+    {
+        if ($conversation->sender_id != Auth::id() && $conversation->receiver_id != Auth::id()) {
+            abort(403);
+        }
+
+        $conversation->messages()->delete();
+        $conversation->delete();
+
+        return redirect()->route('messages.index')->with('success', 'Conversa excluída.');
+    }
+
+    public function updateConversation(Request $request, Conversation $conversation)
+    {
+        if ($conversation->sender_id != Auth::id() && $conversation->receiver_id != Auth::id()) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'title' => 'nullable|string|max:80',
+        ]);
+
+        $conversation->update([
+            'title' => filled($data['title'] ?? null) ? trim($data['title']) : null,
+        ]);
+
+        return back()->with('success', 'Conversa atualizada.');
+    }
+
     public function start(User $user)
     {
         $authId = Auth::id();
@@ -110,10 +176,8 @@ class MessageController extends Controller
             return response()->json([]);
         }
 
-        // Usamos o model completo para que os accessors (como profile_photo_url) funcionem
         $users = User::where('id', '!=', $authId)
             ->where(function($q) use ($query) {
-                // LOWER garante que a busca não seja afetada por letras maiúsculas
                 $q->where('name', 'LIKE', "%{$query}%")
                     ->orWhere('email', 'LIKE', "%{$query}%");
             })

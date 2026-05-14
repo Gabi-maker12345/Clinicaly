@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2d657e5f06f841b013e9c072664b7732",
+    "content-hash": "f1944af3fc9677fe5d0d3ecd30b22b3a",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1444,33 +1444,33 @@
         },
         {
             "name": "laravel/jetstream",
-            "version": "v5.4.0",
+            "version": "v5.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/jetstream.git",
-                "reference": "5a83a20b419c2b2c42a8c2407ca4647d8734456b"
+                "reference": "555fda2f7b84eb551b81172ba1ad7794974924cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/jetstream/zipball/5a83a20b419c2b2c42a8c2407ca4647d8734456b",
-                "reference": "5a83a20b419c2b2c42a8c2407ca4647d8734456b",
+                "url": "https://api.github.com/repos/laravel/jetstream/zipball/555fda2f7b84eb551b81172ba1ad7794974924cc",
+                "reference": "555fda2f7b84eb551b81172ba1ad7794974924cc",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "illuminate/console": "^11.0|^12.0",
-                "illuminate/support": "^11.0|^12.0",
+                "illuminate/console": "^11.0|^12.0|^13.0",
+                "illuminate/support": "^11.0|^12.0|^13.0",
                 "laravel/fortify": "^1.20",
                 "mobiledetect/mobiledetectlib": "^4.8.08",
                 "php": "^8.2.0",
-                "symfony/console": "^7.0"
+                "symfony/console": "^7.0|^8.0"
             },
             "require-dev": {
                 "inertiajs/inertia-laravel": "^2.0",
                 "laravel/sanctum": "^4.0",
                 "livewire/livewire": "^3.3",
                 "mockery/mockery": "^1.0",
-                "orchestra/testbench": "^9.15|^10.8",
+                "orchestra/testbench": "^9.15|^10.8|^11.0",
                 "phpstan/phpstan": "^1.10"
             },
             "type": "library",
@@ -1506,7 +1506,7 @@
                 "issues": "https://github.com/laravel/jetstream/issues",
                 "source": "https://github.com/laravel/jetstream"
             },
-            "time": "2025-11-25T14:46:14+00:00"
+            "time": "2026-03-20T15:08:31+00:00"
         },
         {
             "name": "laravel/prompts",

@@ -16,7 +16,7 @@
     <section class="fi fi1" style="margin-top:14px;" aria-label="Resumo rápido">
         <div role="status" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--rs);font-size:.84rem;font-weight:500;border:1px solid;background:var(--rb);border-color:var(--rbd);color:var(--rd);">
             <i class="fa-solid fa-hourglass-half" aria-hidden="true" style="flex-shrink:0;"></i>
-            <p><strong>{{ $stats['pendentes'] }} diagnóstico{{ $stats['pendentes'] != 1 ? 's' : '' }}</strong> a aguardar validação médica</p>
+            <p style="flex:1;margin:0;text-align:left;line-height:1.35;"><strong>{{ $stats['pendentes'] }} diagnóstico{{ $stats['pendentes'] != 1 ? 's' : '' }}</strong> a aguardar validação médica</p>
             <a href="{{ route('discovery.index') }}" style="margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:30px;border:none;font-family:'Dosis',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer;text-decoration:none;background:transparent;color:var(--rd);border:1.5px solid var(--rbd);">Ver</a>
         </div>
     </section>

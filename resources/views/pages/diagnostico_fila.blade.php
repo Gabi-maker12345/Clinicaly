@@ -11,7 +11,7 @@
         input, textarea, select { background-color: var(--sf2) !important; color: var(--tx) !important; }
     </style>
     {{-- x-data inicializa o filtro do Alpine.js --}}
-    <main class="mt-12 max-w-5xl mx-auto px-6 pb-20" x-data="{ filter: 'all' }" style="background: var(--bg); color: var(--tx);".
+    <main class="max-w-5xl mx-auto pb-20" x-data="{ filter: 'all', search: '' }" style="background: var(--bg); color: var(--tx);">
         
         {{-- CABEÇALHO DA PÁGINA --}}
         <section class="mb-8">
@@ -82,6 +82,7 @@
             <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex items-center gap-2">
                 <i class="fa-solid fa-list"></i> Por validar
             </h2>
+            <input type="search" x-model="search" placeholder="Pesquisar por paciente ou diagnóstico..." style="width:100%;margin-bottom:16px;padding:12px 16px;border:1px solid var(--bd);border-radius:30px;background:var(--sf2);color:var(--tx);">
             
             <div class="space-y-4">
                 @forelse($diagnosticos as $diagnostico)
@@ -115,7 +116,8 @@
                     @endphp
 
                     {{-- x-show e x-transition controlam a exibição baseada no filtro --}}
-                    <article x-show="filter === 'all' || filter === '{{ $diagnostico->nivel_gravidade }}'" 
+                    <article data-search="{{ strtolower(($diagnostico->paciente->name ?? '') . ' ' . $doencasStr) }}"
+                             x-show="(filter === 'all' || filter === '{{ $diagnostico->nivel_gravidade }}') && $el.dataset.search.includes(search.toLowerCase())" 
                              x-transition
                              class="p-5 border rounded-[25px] flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-[#6d55b1] transition-all {{ $rowStyle }}">
                         

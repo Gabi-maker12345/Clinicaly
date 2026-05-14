@@ -17,13 +17,22 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): void
     {
+        $input = array_merge([
+            'name' => null,
+            'email' => null,
+            'photo' => null,
+        ], $input);
+
         Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
+            'name' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
         ])->validateWithBag('updateProfileInformation');
 
-        if (isset($input['photo'])) {
+        $input['name'] = filled($input['name']) ? trim($input['name']) : $user->name;
+        $input['email'] = filled($input['email']) ? trim($input['email']) : $user->email;
+
+        if ($input['photo']) {
             $user->updateProfilePhoto($input['photo']);
         }
 

@@ -53,7 +53,7 @@
                 <div class="bg-red-500 text-white w-10 h-10 rounded-2xl flex items-center justify-center shrink-0">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
-                <p class="font-medium text-sm">Atenção médico: Você possui diagnósticos que requerem revisão imediata.</p>
+                <p class="font-medium text-sm flex-1 text-left">Atenção médico: Você possui diagnósticos que requerem revisão imediata.</p>
                 <a href="{{ route('diagnostico.fila') }}" class="ml-auto bg-red-600 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest">Ver Fila</a>
             </div>
         </section>

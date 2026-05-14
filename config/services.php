@@ -22,6 +22,14 @@ return [
         'key' => env('RESEND_API_KEY'),
     ],
 
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+        'base_url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),
+        'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+        'timeout' => env('GROQ_TIMEOUT', 30),
+        'verify_ssl' => env('GROQ_VERIFY_SSL', true),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),

@@ -17,6 +17,8 @@ class Diagnostico extends Model
         'dados_biometricos',
         'status',
         'doencas_sugeridas',
+        'doenca_final',
+        'parecer_medico',
         'links_referencia',
         'alertas_criticos',
     ];
@@ -26,7 +28,12 @@ class Diagnostico extends Model
         'dados_biometricos' => 'array',
         'links_referencia' => 'array',
         'doencas_sugeridas' => 'array',
+        'parecer_medico' => 'array',
         'alertas_criticos' => 'array',
+    ];
+
+    protected $appends = [
+        'confirmed_disease_name',
     ];
 
     public function medico() {
@@ -40,6 +47,14 @@ class Diagnostico extends Model
     public function doenca()
     {
         return $this->belongsTo(Disease::class, 'id_doenca');
+    }
+
+    public function getConfirmedDiseaseNameAttribute(): string
+    {
+        return $this->doenca?->name
+            ?? $this->doenca_final
+            ?? ($this->parecer_medico['doenca'] ?? null)
+            ?? ($this->doencas_sugeridas[0]['nome'] ?? 'Diagnóstico clínico');
     }
 
     public function sintomas()

@@ -81,6 +81,9 @@ class DiagnosticController extends Controller
 
         $diagnostico->update([
             'status' => 'validado',
+            'id_medico' => Auth::id(),
+            'id_doenca' => $this->resolveDiseaseId($request->doenca_confirmada, $diagnostico),
+            'doenca_final' => $request->doenca_confirmada,
             'parecer_medico' => [
                 'doenca' => $request->doenca_confirmada,
                 'gravidade' => $request->gravidade_real,
@@ -89,12 +92,9 @@ class DiagnosticController extends Controller
             ]
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Diagnóstico validado com sucesso!');
+        return redirect()->route('prescriptions.create', $diagnostico)->with('success', 'Diagnóstico validado. Emita a prescrição para concluir o fluxo.');
     }
 
-    /**
-     * Rejeita o diagnóstico (Elimina o registo)
-     */
     public function rejeitar(Diagnostico $diagnostico)
     {
         $diagnostico->delete();
@@ -135,15 +135,10 @@ class DiagnosticController extends Controller
             'counts' => $counts
         ]);
     }
-
-    /**
-     * Exibe o perfil do médico com a lista de pacientes integrada.
-     */
     public function profile()
     {
         $user = Auth::user();
-        
-        // Busca o diagnóstico mais recente de cada paciente relacionado a este sistema
+
         $pacientes = Diagnostico::with('paciente')
             ->latest()
             ->get()
@@ -162,8 +157,24 @@ class DiagnosticController extends Controller
                 }
                 return $diag;
             });
+        $filaDiagnosticos = Diagnostico::with(['paciente', 'doenca'])
+            ->where('status', 'pendente')
+            ->latest()
+            ->get()
+            ->map(function ($diag) {
+                $topProb = $diag->doencas_sugeridas[0]['probabilidade'] ?? 0;
 
-        // Carrega diagnósticos relacionados ao usuário atual com suas prescrições
+                if ($topProb >= 80) {
+                    $diag->status_contexto = 'pendente_critico';
+                } elseif ($topProb >= 50) {
+                    $diag->status_contexto = 'pendente_alto';
+                } else {
+                    $diag->status_contexto = 'pendente';
+                }
+
+                return $diag;
+            });
+
         $meusDiagnosticos = Diagnostico::with(['paciente', 'doenca'])
             ->where('id_paciente', $user->id)
             ->latest()
@@ -183,7 +194,7 @@ class DiagnosticController extends Controller
                 
                 // Carrega a prescrição associada a este diagnóstico
                 $diag->prescricao = Prescription::where('diagnostico_id', $diag->id)
-                    ->with(['monitorings', 'diagnostico.doenca', 'diagnostico.paciente'])
+                    ->with(['monitorings.intakeLogs', 'diagnostico.doenca', 'diagnostico.paciente', 'diagnostico.medico'])
                     ->first();
                 
                 return $diag;
@@ -192,7 +203,7 @@ class DiagnosticController extends Controller
         // Carrega prescrições relacionadas aos diagnósticos do usuário
         $minhasPrescricoes = collect();
         if ($user->role === 'pacient') {
-            $minhasPrescricoes = \App\Models\Prescription::with(['diagnostico.doenca', 'diagnostico.paciente', 'monitorings'])
+            $minhasPrescricoes = \App\Models\Prescription::with(['diagnostico.doenca', 'diagnostico.paciente', 'diagnostico.medico', 'monitorings.intakeLogs'])
                 ->whereHas('diagnostico', function ($query) use ($user) {
                     $query->where('id_paciente', $user->id);
                 })
@@ -200,18 +211,71 @@ class DiagnosticController extends Controller
                 ->get();
         }
 
-        return view('profile.show', compact('user', 'pacientes', 'meusDiagnosticos', 'minhasPrescricoes'));
+        $prescricoesMedico = collect();
+        if (in_array($user->role, ['doctor', 'medico', 'médico'], true)) {
+            $prescricoesMedico = Prescription::with(['diagnostico.paciente', 'diagnostico.medico', 'diagnostico.doenca', 'monitorings.intakeLogs'])
+                ->whereHas('diagnostico', function ($query) use ($user) {
+                    $query->where('id_medico', $user->id);
+                })
+                ->latest()
+                ->get();
+        }
+
+        $agendaData = app(AppointmentController::class)->agendaData();
+
+        return view('profile.show', compact('user', 'pacientes', 'filaDiagnosticos', 'meusDiagnosticos', 'minhasPrescricoes', 'prescricoesMedico', 'agendaData'));
+    }
+
+    public function resultado(Diagnostico $diagnostico)
+    {
+        $diagnostico->load(['paciente', 'doenca']);
+
+        if (! in_array(Auth::user()->role ?? '', ['doctor', 'medico', 'médico'], true) && $diagnostico->id_paciente !== Auth::id()) {
+            abort(403);
+        }
+
+        $suggested = collect($diagnostico->doencas_sugeridas ?? []);
+        $diseaseIds = $suggested->pluck('id')->filter()->all();
+        $diseases = Disease::with('symptoms')->whereIn('id', $diseaseIds)->get()->keyBy('id');
+
+        $results = $suggested->map(function (array $item) use ($diseases) {
+            $disease = $diseases->get($item['id'] ?? null) ?? new Disease(['name' => $item['nome'] ?? 'Diagnóstico']);
+            $disease->probability = $item['probabilidade'] ?? 0;
+            $disease->cobertura = $item['cobertura'] ?? 0;
+            $disease->match_count = $disease->symptoms?->count() ?? 0;
+            $disease->mod_idade = 1;
+            $disease->mod_genero = 1;
+            $disease->mod_imc = 1;
+            $disease->severity = $item['severidade'] ?? $disease->severity ?? 'medium';
+            $disease->icd_code = $item['icd_code'] ?? $disease->icd_code ?? null;
+
+            return $disease;
+        });
+
+        return view('results', [
+            'results' => $results,
+            'perfil' => $diagnostico->dados_biometricos ?? [],
+            'alertas_criticos' => $diagnostico->alertas_criticos ?? [],
+            'diagnostico' => $diagnostico,
+            'age' => $diagnostico->dados_biometricos['idade'] ?? null,
+            'gender' => $diagnostico->dados_biometricos['genero'] ?? null,
+        ]);
+    }
+
+    private function resolveDiseaseId(string $diseaseName, Diagnostico $diagnostico): ?int
+    {
+        $suggested = collect($diagnostico->doencas_sugeridas ?? [])
+            ->first(fn ($item) => ($item['nome'] ?? null) === $diseaseName);
+
+        return $suggested['id'] ?? Disease::where('name', $diseaseName)->value('id');
     }
 
     public function history($id)
     {
-        // Correção 1: Usar User em vez de Patient (conforme sua model)
         $patient = User::with(['searchHistories', 'chatSessions'])->findOrFail($id);
 
-        // Busca diagnósticos relacionados
         $diagnosticosMedicos = Diagnostico::where('id_paciente', $id)->with('medico')->get();
 
-        // Correção 2: Adicionar 'total_prescriptions' para evitar erro no card
         $stats = [
             'total_diagnostics'   => $diagnosticosMedicos->count(),
             'total_chats'         => $patient->chatSessions->count(),
@@ -232,7 +296,7 @@ class DiagnosticController extends Controller
                             ? ($diag->parecer_medico['doenca'] ?? 'Confirmado') 
                             : ($diag->doencas_sugeridas[0]['nome'] ?? 'Suspeita'),
                 'status'   => $diag->status,
-                'score'    => $prob, // Resolve erro "Undefined array key score"
+                'score'    => $prob,
                 'severity' => $prob >= 80 ? 'Crítica' : ($prob >= 50 ? 'Alta' : 'Baixa'),
                 'doctor'   => $diag->medico->name ?? 'Sistema', // Resolve erro "Undefined array key doctor"
             ]);
