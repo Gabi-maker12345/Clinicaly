@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         \App\Console\Commands\CheckMedicationReminders::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            \App\Http\Middleware\UseTabScopedAccount::class,
+        ]);
+
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);

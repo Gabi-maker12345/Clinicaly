@@ -23,12 +23,16 @@ class AppServiceProvider extends ServiceProvider
     {
         // Definindo quem é médico
         Gate::define('access-doctor-panel', function (User $user) {
-            return $user->role === 'doctor';
+            return $user->isDoctor();
         });
 
         // Definindo quem é paciente
         Gate::define('access-patient-panel', function (User $user) {
-            return $user->role === 'patient';
+            return $user->isPatient();
+        });
+
+        Gate::define('access-clinic-panel', function (User $user) {
+            return $user->isClinic();
         });
     }
 }

@@ -69,6 +69,14 @@ class PrescriptionController extends Controller
 
         $diagnostico->update(['status' => 'validado']);
 
+        if (Auth::user()?->clinic_id) {
+            $diagnostico->update(['clinic_id' => Auth::user()->clinic_id]);
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Prescrição emitida. Informe os itens utilizados no checkout.')
+                ->with('stock_checkout_prescription_id', $prescription->id);
+        }
+
         return redirect()->route('dashboard')->with('success', 'Prescrição emitida e diagnóstico validado!');
     }
 

@@ -14,10 +14,13 @@ class Message extends Model
         'conversation_id',
         'user_id',
         'body',
+        'type',
+        'payload',
         'read'
     ];
 
     protected $casts = [
+        'payload' => 'array',
         'read' => 'boolean',
     ];
 

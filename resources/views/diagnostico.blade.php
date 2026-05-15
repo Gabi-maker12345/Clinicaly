@@ -51,7 +51,8 @@
         .info-modal-overlay{display:none;position:fixed;inset:0;z-index:130;background:rgba(10,8,20,.62);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
         .info-modal-overlay.open{display:flex}
         .info-modal{width:min(680px,100%);max-height:min(86vh,760px);overflow-y:auto;background:var(--sf);border:1px solid var(--bd);border-radius:28px;box-shadow:0 24px 70px rgba(0,0,0,.28);padding:28px;color:var(--tx)}
-        .info-modal::-webkit-scrollbar{width:4px}.info-modal::-webkit-scrollbar-thumb{background:var(--bd);border-radius:999px}
+        .info-modal{scrollbar-width:none}
+        .info-modal::-webkit-scrollbar{width:0;height:0}
         .info-modal-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px}
         .info-modal-icon{width:52px;height:52px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:var(--is);color:var(--in);font-size:1.1rem;flex:0 0 auto}
         .info-modal h2{font-size:1.55rem;font-weight:900;line-height:1.05;margin:0 0 6px}
@@ -97,19 +98,18 @@
         #section-diagnostico input[type=number]{appearance:textfield!important;-moz-appearance:textfield!important}
         #section-diagnostico input[type=number]::-webkit-outer-spin-button,
         #section-diagnostico input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none!important;margin:0!important}
+        .clinical-prefill-card{min-width:0!important;overflow:hidden!important}
+        .clinical-prefill-text{max-width:100%!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;word-break:break-word!important;line-height:1.55!important}
         #patientResults,#symptomDropdown,#searchResults{
             border:1px solid var(--bd)!important;
             background:var(--sf)!important;
             color:var(--tx)!important;
             border-radius:14px!important;
             box-shadow:var(--sh2)!important;
-            scrollbar-width:thin;
-            scrollbar-color:var(--bd) transparent;
+            scrollbar-width:none;
         }
-        #patientResults::-webkit-scrollbar,#symptomDropdown::-webkit-scrollbar,#searchResults::-webkit-scrollbar,#symptomList::-webkit-scrollbar{width:4px}
-        #patientResults::-webkit-scrollbar-track,#symptomDropdown::-webkit-scrollbar-track,#searchResults::-webkit-scrollbar-track,#symptomList::-webkit-scrollbar-track{background:transparent}
-        #patientResults::-webkit-scrollbar-thumb,#symptomDropdown::-webkit-scrollbar-thumb,#searchResults::-webkit-scrollbar-thumb,#symptomList::-webkit-scrollbar-thumb{background:var(--bd);border-radius:999px}
-        #symptomList{border-radius:16px!important;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+        #patientResults::-webkit-scrollbar,#symptomDropdown::-webkit-scrollbar,#searchResults::-webkit-scrollbar,#symptomList::-webkit-scrollbar{width:0;height:0}
+        #symptomList{border-radius:16px!important;scrollbar-width:none}
         #selectedSymptoms>div{border-radius:999px!important}
         #section-diagnostico button[type="submit"]{border-radius:16px!important;box-shadow:0 10px 28px rgba(109,85,177,.22)!important}
         @media(max-width:640px){#section-diagnostico form>div{padding:18px!important}#section-diagnostico .grid{grid-template-columns:1fr!important}}
@@ -321,6 +321,50 @@
 
                 <form action="{{ route('processar.diagnostico') }}" method="POST" class="max-w-3xl mx-auto space-y-6">
                     @csrf
+                    @if(request('as_role'))
+                        <input type="hidden" name="as_role" value="{{ request('as_role') }}">
+                    @endif
+                    @if(!empty($diagnosticPrefill))
+                        <input type="hidden" name="clinical_request_description" value="{{ $diagnosticPrefill['description'] ?? '' }}">
+                        <input type="hidden" name="clinical_request_evolution" value="{{ $diagnosticPrefill['evolution'] ?? '' }}">
+                        <input type="hidden" name="clinical_request_triggers" value="{{ $diagnosticPrefill['triggers'] ?? '' }}">
+                        <input type="hidden" name="clinical_request_medical_history" value="{{ $diagnosticPrefill['medical_history'] ?? '' }}">
+                        <input type="hidden" name="clinical_request_context" value="{{ $diagnosticPrefill['context'] ?? '' }}">
+                        <input type="hidden" name="clinical_request_submitted_at" value="{{ $diagnosticPrefill['submitted_at'] ?? '' }}">
+
+                        <div style="background: var(--sf); border: 1px solid var(--bd);" class="clinical-prefill-card p-8 rounded-[35px] shadow-sm">
+                            <div class="flex items-start justify-between gap-4 mb-5">
+                                <div>
+                                    <span style="color: var(--in);" class="text-[10px] font-black uppercase tracking-widest">Pedido recebido pelo chat</span>
+                                    <h3 style="color: var(--tx);" class="text-xl font-black mt-1">Resumo clínico enviado por {{ $diagnosticPrefill['patient_name'] ?? 'paciente' }}</h3>
+                                </div>
+                                <i class="fa-solid fa-file-medical" style="color:var(--in);font-size:1.6rem;"></i>
+                            </div>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <p style="color:var(--mu);" class="text-xs font-black uppercase tracking-widest mb-1">O que sente</p>
+                                    <p style="color:var(--tx);" class="clinical-prefill-text font-semibold">{{ $diagnosticPrefill['description'] ?? 'Não informado' }}</p>
+                                </div>
+                                <div>
+                                    <p style="color:var(--mu);" class="text-xs font-black uppercase tracking-widest mb-1">Quando começou e evolução</p>
+                                    <p style="color:var(--tx);" class="clinical-prefill-text font-semibold">{{ $diagnosticPrefill['evolution'] ?? 'Não informado' }}</p>
+                                </div>
+                                <div>
+                                    <p style="color:var(--mu);" class="text-xs font-black uppercase tracking-widest mb-1">Melhora ou piora</p>
+                                    <p style="color:var(--tx);" class="clinical-prefill-text font-semibold">{{ $diagnosticPrefill['triggers'] ?? 'Não informado' }}</p>
+                                </div>
+                                <div>
+                                    <p style="color:var(--mu);" class="text-xs font-black uppercase tracking-widest mb-1">Historial e medicamentos</p>
+                                    <p style="color:var(--tx);" class="clinical-prefill-text font-semibold">{{ $diagnosticPrefill['medical_history'] ?? 'Não informado' }}</p>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <p style="color:var(--mu);" class="text-xs font-black uppercase tracking-widest mb-1">Contexto</p>
+                                    <p style="color:var(--tx);" class="clinical-prefill-text font-semibold">{{ $diagnosticPrefill['context'] ?? 'Não informado' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <div style="background: var(--sf); border: 1px solid var(--bd);" class="p-8 rounded-[35px] shadow-sm">
                         {{-- BUSCA DE PACIENTE --}}
                         <div class="mb-8 relative">
@@ -351,6 +395,7 @@
                                         style="width: 100%; padding: 12px; background: var(--sf2); border: 1.5px solid var(--bd); border-radius: 12px; color: var(--tx); outline: none;">
                                     <option value="m">Masculino</option>
                                     <option value="f">Feminino</option>
+                                    <option value="outro">Outro</option>
                                 </select>
                             </div>
                             <div>
@@ -549,7 +594,8 @@
         allPatients: {!! $patients->toJson() !!},
         allDiseases: {!! $diseases->toJson() !!},
         allCategories: {!! $categories->toJson() !!},
-        allMedications: {!! $medications->toJson() !!}
+        allMedications: {!! $medications->toJson() !!},
+        diagnosticPrefill: @js($diagnosticPrefill ?? null)
     };
     
     // Set initial view for doctors
@@ -719,6 +765,37 @@
         document.getElementById('searchPatient').value = name;
         document.getElementById('patientId').value = id;
         document.getElementById('patientResults').style.display = 'none';
+    }
+
+    function applyDiagnosticPrefill() {
+        const prefill = appState.diagnosticPrefill;
+        if (!prefill) return;
+
+        switchView('diagnostico');
+
+        if (prefill.patient_id && prefill.patient_name) {
+            selectPatient(prefill.patient_id, prefill.patient_name);
+        }
+
+        const fieldMap = {
+            age: prefill.age,
+            weight: prefill.weight,
+            height: prefill.height,
+            gender: prefill.gender
+        };
+
+        Object.entries(fieldMap).forEach(([id, value]) => {
+            const field = document.getElementById(id);
+            if (field && value !== undefined && value !== null && value !== '') {
+                field.value = value;
+            }
+        });
+
+        const symptoms = Array.isArray(prefill.symptoms) && prefill.symptoms.length
+            ? prefill.symptoms
+            : (Array.isArray(prefill.symptom_ids) ? prefill.symptom_ids.map(id => appState.allSymptoms.find(s => Number(s.id) === Number(id))).filter(Boolean) : []);
+
+        symptoms.forEach(symptom => addSymptom(Number(symptom.id), symptom.name));
     }
 
     // Perform universal search
@@ -1089,6 +1166,7 @@
     // Initialize - show first section
     window.addEventListener('DOMContentLoaded', function() {
         switchView(appState.view);
+        applyDiagnosticPrefill();
         @if($errors->any() || session('error'))
             openStandardAlert(@js(session('error') ?: $errors->first()), 'Erro ao processar diagnóstico');
         @endif

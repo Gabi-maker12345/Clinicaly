@@ -1,8 +1,9 @@
 <x-app-layout>
 @php
     $role = auth()->user()->role ?? 'pacient';
-    $isDoctor = in_array($role, ['doctor', 'medico', 'médico'], true);
-    $roleLabel = $isDoctor ? 'Médico' : 'Paciente';
+    $isDoctor = auth()->user()->isDoctor();
+    $isClinic = auth()->user()->isClinic();
+    $roleLabel = auth()->user()->roleLabel();
     $diagnosticosPendentes = ($isDoctor ? ($filaDiagnosticos ?? collect()) : $meusDiagnosticos)->where('status', 'pendente');
     $diagnosticosValidados = ($isDoctor ? $pacientes : $meusDiagnosticos)->where('status', 'validado');
     $prescricoes = $isDoctor ? ($prescricoesMedico ?? collect()) : $minhasPrescricoes;
@@ -15,6 +16,8 @@
 
 <style>
     .view-shell{max-width:1180px;margin:0 auto}
+    .view-shell *{scrollbar-width:none}
+    .view-shell *::-webkit-scrollbar{width:0;height:0}
     .view-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px}
     .view-title{font-size:1.7rem;font-weight:800;line-height:1.1;color:var(--tx)}
     .muted{color:var(--mu);font-weight:600}
@@ -43,9 +46,38 @@
     .modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid var(--bd)}
     .modal-close{background:none;border:0;cursor:pointer;color:var(--mu);font-size:1.1rem;padding:6px;border-radius:999px}
     .modal-close:hover{color:var(--rd);background:var(--rb)}
+    .modal-field{display:flex;flex-direction:column;gap:7px}
+    .modal-field label{font-family:'Space Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);font-weight:800}
+    .modal-field input,.modal-field select,.modal-field textarea{width:100%;border:1px solid var(--bd);border-radius:12px;background:var(--sf);color:var(--tx);padding:11px 12px;font-weight:700;outline:none}
+    .modal-field textarea{resize:vertical;min-height:92px}
+    .modal-field select[multiple]{min-height:132px}
+    .modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:var(--in);box-shadow:0 0 0 3px rgba(109,85,177,.12)}
+    .consultation-modal{width:min(980px,calc(100vw - 32px));border-radius:22px}
+    .consultation-modal .modal-head{padding:22px 26px}
+    .consultation-body{padding:24px 26px 26px;display:grid;gap:20px}
+    .consultation-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .consultation-panel{background:var(--sf2);border:1px solid var(--bd);border-radius:16px;padding:16px;min-width:0}
+    .consultation-list{display:grid;gap:10px}
+    .consultation-option{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid var(--bd);border-radius:14px;background:var(--sf);color:var(--tx);text-align:left;cursor:pointer;min-width:0}
+    .consultation-option:hover,.consultation-option.active{border-color:var(--in);background:var(--is)}
+    .consultation-option span{min-width:0}.consultation-option strong{display:block;overflow-wrap:anywhere}.consultation-option small{display:block;margin-top:2px}
+    .consultation-form{display:grid;gap:18px}
+    .consultation-section{background:var(--sf2);border:1px solid var(--bd);border-radius:16px;padding:16px;min-width:0}
+    .consultation-biometry{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .consultation-notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .consultation-notes .wide{grid-column:1/-1}
+    .consultation-modal textarea{min-height:108px;line-height:1.45}
+    .consultation-modal .std-actions{margin-top:0;padding-top:4px}
+    @media(max-width:860px){.consultation-picker,.consultation-notes{grid-template-columns:1fr}.consultation-biometry{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:560px){.consultation-modal{width:calc(100vw - 20px)}.consultation-body,.consultation-modal .modal-head{padding:18px}.consultation-biometry{grid-template-columns:1fr}}
+    input[type=number]{appearance:textfield;-moz-appearance:textfield}
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     .pharmacy-list{display:flex;flex-direction:column;gap:10px;max-height:430px;overflow-y:auto;padding:18px 22px;scrollbar-width:none}
     .pharmacy-list::-webkit-scrollbar{width:0;height:0}
     .pharmacy-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--bd);border-radius:14px;background:var(--sf2)}
+    .modal-field select::-webkit-scrollbar,.modal-field input::-webkit-scrollbar,.modal-field textarea::-webkit-scrollbar{width:0;height:0}
+    .modal-field select[multiple]{scrollbar-width:none}
     .map-panel{width:100%;min-height:260px;background:var(--sf2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border-bottom:1px solid var(--bd);text-align:center;padding:28px}
     .active-dose{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--wbd);background:var(--wb);border-radius:14px;margin-top:10px;flex-wrap:wrap}
     .std-modal{width:min(420px,100%);background:var(--sf);border:1px solid var(--bd);border-radius:20px;box-shadow:var(--sh3);padding:22px}
@@ -73,7 +105,7 @@
     @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 </style>
 
-<div class="view-shell"
+<div class="view-shell" id="profileShell"
      x-data="{
         tab: (window.location.hash || '#dashboard').replace('#',''),
         selectedPrescription: null,
@@ -91,6 +123,19 @@
         pharmacyMedication: '',
         pharmacies: [],
         prescriptions: @js($prescricaoData),
+        clinicModalOpen: false,
+        clinics: @js($clinicOptions ?? []),
+        selectedClinic: null,
+        selectedDoctor: null,
+        openClinicModal(){
+            this.selectedClinic = this.clinics[0] || null;
+            this.selectedDoctor = this.selectedClinic?.doctors?.[0] || null;
+            this.clinicModalOpen = true;
+        },
+        chooseClinic(clinic){
+            this.selectedClinic = clinic;
+            this.selectedDoctor = clinic?.doctors?.[0] || null;
+        },
         openPrescription(id){ this.selectedPrescription = this.prescriptions[id]; this.tab = 'prescription_detail'; window.location.hash = 'prescription_detail'; },
         showNotice(title, message){ this.noticeTitle = title; this.noticeMessage = message; this.noticeOpen = true; },
         closePharmacies(){ this.pharmacyOpen = false; this.pharmacies = []; this.pharmacyError = ''; this.pharmacyNotice = ''; },
@@ -156,6 +201,12 @@
             this.selectedPrescription = prescription;
             this.prescriptions[prescription.id] = prescription;
         },
+        requestSelectedSymptoms: [],
+        allConsultationSymptoms: @js($consultationSymptoms ?? collect()),
+        addReqSymptom(id, name){ window.addRequestSymptom(this, id, name); },
+        removeReqSymptom(id){ window.removeRequestSymptom(this, id); },
+        renderReqSymptoms(){ window.renderRequestSelectedSymptoms(this); },
+        prepareClinicSubmit(event){ window.prepareClinicFormSubmit(this, event); },
         async completeDose(log){
             const response = await fetch('{{ route('monitoring.logs.complete', '__LOG_ID__') }}'.replace('__LOG_ID__', log.id), {
                 method: 'PATCH',
@@ -191,11 +242,12 @@
                 this.showNotice('Erro', error.message || 'Não foi possível iniciar esta prescrição.');
             }
         },
-        go(value){ this.tab = value; window.location.hash = value; }
+        syncHashTab(){ this.tab = (window.location.hash || '#dashboard').replace('#',''); window.syncProfileHashTabs?.(); },
+        go(value){ this.tab = value; window.location.hash = value; window.syncProfileHashTabs?.(); }
      }"
-     x-init="window.addEventListener('hashchange', () => tab = (window.location.hash || '#dashboard').replace('#','')); setInterval(() => nowTick = Date.now(), 15000)">
+     x-init="window.addEventListener('hashchange', () => syncHashTab()); syncHashTab(); setInterval(() => this.nowTick = Date.now(), 15000)">
 
-    <section x-show="tab === 'dashboard'" class="tab-card">
+    <section x-show="tab === 'dashboard'" data-profile-tab="dashboard" class="tab-card">
         <div class="view-head">
             <div>
                 <span class="tag tag-green">{{ $roleLabel }}</span>
@@ -203,9 +255,23 @@
                 <span class="mono">Visão geral clínica</span>
             </div>
             @if($isDoctor)
-                <a href="{{ route('discovery.index') }}" class="btn btn-primary">
-                    <i class="fa-solid fa-plus"></i> Nova Consulta
-                </a>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <form method="POST" action="{{ route('doctor.availability.update') }}">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" class="btn {{ $user->is_available ? 'btn-green' : 'btn-danger' }}">
+                            <i class="fa-solid {{ $user->is_available ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
+                            {{ $user->is_available ? 'Livre' : 'Ocupado' }}
+                        </button>
+                    </form>
+                    <a href="{{ route('discovery.index') }}" class="btn btn-primary">
+                        <i class="fa-solid fa-plus"></i> Nova Consulta
+                    </a>
+                </div>
+            @else
+                <button type="button" class="btn btn-primary" @click="openClinicModal()">
+                    <i class="fa-solid fa-calendar-plus"></i> Nova consulta
+                </button>
             @endif
         </div>
 
@@ -261,7 +327,7 @@
         </div>
     </section>
 
-    <section x-show="tab === 'fila'" x-cloak class="tab-card">
+    <section x-show="tab === 'fila'" x-cloak data-profile-tab="fila" class="tab-card">
         <div class="view-head"><div><h1 class="view-title">Fila de Validação</h1><p class="muted">Diagnósticos aguardando revisão médica.</p></div></div>
         <article class="card">
             <input type="search" x-model="searchFila" placeholder="Pesquisar por paciente ou diagnóstico..." style="width:100%;margin-bottom:16px;padding:12px 16px;border:1px solid var(--bd);border-radius:30px;background:var(--sf2);color:var(--tx);">
@@ -282,11 +348,11 @@
         </article>
     </section>
 
-    <section x-show="tab === 'agenda'" x-cloak class="tab-card">
+    <section x-show="tab === 'agenda'" x-cloak data-profile-tab="agenda" class="tab-card">
         @include('appointments._content', $agendaData ?? [])
     </section>
 
-    <section x-show="tab === 'analise1' || tab === 'analise2' || tab === 'analise3'" x-cloak class="tab-card">
+    <section x-show="tab === 'analise1' || tab === 'analise2' || tab === 'analise3'" x-cloak data-profile-tab="analise1 analise2 analise3" class="tab-card">
         <article class="card placeholder">
             <div>
                 <div style="font-size:2rem;color:var(--in);margin-bottom:12px;"><i class="fa-solid fa-chart-simple"></i></div>
@@ -296,7 +362,7 @@
         </article>
     </section>
 
-    <section x-show="tab === 'patients'" x-cloak class="tab-card">
+    <section x-show="tab === 'patients'" x-cloak data-profile-tab="patients" class="tab-card">
         <div class="view-head"><div><h1 class="view-title">Pacientes</h1><p class="muted">{{ $pacientes->count() }} pacientes ativos no sistema.</p></div></div>
         <article class="card">
             <input type="search" x-model="searchPatients" placeholder="Pesquisar paciente..." style="width:100%;margin-bottom:16px;padding:12px 16px;border:1px solid var(--bd);border-radius:30px;background:var(--sf2);color:var(--tx);">
@@ -317,7 +383,7 @@
         </article>
     </section>
 
-    <section x-show="tab === 'prescricoes'" x-cloak class="tab-card">
+    <section x-show="tab === 'prescricoes'" x-cloak data-profile-tab="prescricoes" class="tab-card">
         <div class="view-head"><div><h1 class="view-title">Prescrições</h1><p class="muted">{{ $prescricoes->count() }} prescrição(ões) registrada(s).</p></div></div>
         <article class="card table-wrap">
             <input type="search" x-model="searchPrescriptions" placeholder="Pesquisar por paciente ou status..." style="width:100%;margin-bottom:16px;padding:12px 16px;border:1px solid var(--bd);border-radius:30px;background:var(--sf2);color:var(--tx);">
@@ -339,7 +405,7 @@
         </article>
     </section>
 
-    <section x-show="tab === 'prescription_detail'" x-cloak class="tab-card">
+    <section x-show="tab === 'prescription_detail'" x-cloak data-profile-tab="prescription_detail" class="tab-card">
         <button type="button" class="btn btn-ghost" style="margin-bottom:16px;" @click="go('prescricoes')"><i class="fa-solid fa-arrow-left"></i>Voltar</button>
         <div x-show="selectedPrescription">
             <section class="view-head" style="margin-bottom:14px;">
@@ -537,7 +603,156 @@
         </div>
     </div>
 
-    <section x-show="tab === 'profile'" x-cloak class="tab-card">
+    <div class="modal-overlay" :class="clinicModalOpen ? 'open' : ''" x-show="clinicModalOpen" x-cloak @click.self="clinicModalOpen=false" role="dialog" aria-modal="true">
+        <form method="POST" action="{{ route('clinical-requests.store') }}" class="modal-box consultation-modal" @submit="prepareClinicSubmit($event)">
+            @csrf
+            <input type="hidden" name="clinic_id" :value="selectedClinic?.id">
+            <input type="hidden" name="doctor_id" :value="selectedDoctor?.id">
+            <div class="modal-head">
+                <div>
+                    <h2 class="view-title">Nova consulta</h2>
+                    <p class="muted">Escolha uma clínica aberta agora, um médico livre e envie o seu quadro clínico.</p>
+                </div>
+                <button type="button" class="modal-close" @click="clinicModalOpen=false"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="consultation-body">
+                <template x-if="!clinics.length">
+                    <div class="alert warning"><i class="fa-solid fa-circle-info"></i><span>Nenhuma clínica aberta neste momento.</span></div>
+                </template>
+                <div class="consultation-picker" x-show="clinics.length">
+                    <article class="consultation-panel">
+                        <p class="mono" style="margin-bottom:10px;">Clínica</p>
+                        <div class="consultation-list">
+                            <template x-for="clinic in clinics" :key="clinic.id">
+                            <button type="button" class="consultation-option" :class="selectedClinic?.id === clinic.id ? 'active' : ''" @click="chooseClinic(clinic)">
+                                <span><strong x-text="clinic.name"></strong><small class="muted" style="display:block;" x-text="'Aberta: ' + clinic.activity_hours"></small></span>
+                                <span class="tag" x-text="clinic.doctors.length + ' livre(s)'"></span>
+                            </button>
+                            </template>
+                        </div>
+                    </article>
+                    <article class="consultation-panel">
+                        <p class="mono" style="margin-bottom:10px;">Médico livre</p>
+                        <template x-if="selectedClinic && !(selectedClinic.doctors || []).length">
+                            <div class="alert warning"><i class="fa-solid fa-circle-info"></i><span>Esta clínica está aberta, mas não tem médicos livres agora.</span></div>
+                        </template>
+                        <div class="consultation-list">
+                            <template x-for="doctor in selectedClinic?.doctors || []" :key="doctor.id">
+                            <button type="button" class="consultation-option" :class="selectedDoctor?.id === doctor.id ? 'active' : ''" @click="selectedDoctor = doctor">
+                                <span><strong x-text="doctor.name"></strong><small class="muted" style="display:block;" x-text="doctor.specialty || 'Clínico geral'"></small></span>
+                                <span class="tag success">Livre</span>
+                            </button>
+                            </template>
+                        </div>
+                    </article>
+                </div>
+                <div x-show="clinics.length && selectedDoctor" class="consultation-form">
+                    <div class="consultation-section">
+                        <p class="mono" style="margin-bottom:10px;">Pedido de análise</p>
+                        <div class="modal-field" style="position:relative;">
+                            <label for="requestSymptomSearch">Sintomas</label>
+                            <input type="text" id="requestSymptomSearch" placeholder="Pesquisar sintoma..." oninput="searchRequestSymptoms()" style="position:relative;z-index:10;border-radius:12px 12px 0 0;border-bottom:none;" onfocus="this.style.borderColor = 'var(--in)'" onblur="this.style.borderColor = 'var(--bd)'">
+                            <div id="requestSymptomsDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-top:none;border-radius:0 0 12px 12px;max-height:240px;overflow-y:auto;z-index:15;box-shadow:var(--sh2);scrollbar-width:none;">
+                                <style scoped>
+                                    #requestSymptomsDropdown::-webkit-scrollbar{width:0;height:0}
+                                </style>
+                            </div>
+                            <p class="muted" style="font-size:.78rem;margin-top:8px;">Pode deixar em branco se não tiver certeza.</p>
+                        </div>
+                        <div id="requestSelectedSymptoms" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;min-height:20px;">
+                            <p class="muted" style="font-size:.85rem;margin:0;">Nenhum sintoma adicionado</p>
+                        </div>
+                        <input type="hidden" id="requestSymptomIds" name="symptom_ids" value="[]">
+                    </div>
+
+                    <div class="consultation-biometry">
+                        <div class="modal-field">
+                            <label for="requestAge">Idade</label>
+                            <input id="requestAge" name="age" type="number" min="0" max="130" required>
+                        </div>
+                        <div class="modal-field">
+                            <label for="requestWeight">Peso (kg)</label>
+                            <input id="requestWeight" name="weight" type="number" min="1" max="500" step="0.1" required>
+                        </div>
+                        <div class="modal-field">
+                            <label for="requestHeight">Altura (m)</label>
+                            <input id="requestHeight" name="height" type="number" min="0.3" max="2.8" step="0.01" placeholder="1.75" required>
+                        </div>
+                        <div class="modal-field">
+                            <label for="requestGender">Gênero</label>
+                            <select id="requestGender" name="gender" required>
+                                <option value="m">Masculino</option>
+                                <option value="f">Feminino</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="consultation-notes">
+                        <div class="modal-field wide">
+                            <label for="requestDescription">Descrição do que sente em todos os detalhes</label>
+                            <textarea id="requestDescription" name="description" required placeholder="Descreva dor, intensidade, localização, frequência e outros sinais."></textarea>
+                        </div>
+                        <div class="modal-field">
+                            <label for="requestEvolution">Quando começou e como evoluiu</label>
+                            <textarea id="requestEvolution" name="evolution" required></textarea>
+                        </div>
+                        <div class="modal-field">
+                            <label for="requestTriggers">O que melhora ou piora os sintomas</label>
+                            <textarea id="requestTriggers" name="triggers" required></textarea>
+                        </div>
+                        <div class="modal-field">
+                            <label for="requestHistory">Historial médico e medicamentos</label>
+                            <textarea id="requestHistory" name="medical_history" required></textarea>
+                        </div>
+                        <div class="modal-field">
+                            <label for="requestContext">Contexto</label>
+                            <textarea id="requestContext" name="context" required placeholder="Viagens, contactos, stress, alimentação ou outros fatores relevantes."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="std-actions">
+                    <button type="button" class="btn btn-ghost" @click="clinicModalOpen=false">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" x-show="clinics.length && selectedDoctor"><i class="fa-solid fa-paper-plane"></i>Solicitar análise</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @if($checkoutPrescription)
+        <div class="modal-overlay open" role="dialog" aria-modal="true">
+            <form method="POST" action="{{ route('clinic.stock.checkout', $checkoutPrescription) }}" class="modal-box" style="max-width:720px;">
+                @csrf
+                <div class="modal-head">
+                    <div>
+                        <h2 class="view-title">Checkout de estoque</h2>
+                        <p class="muted">Informe quais itens foram utilizados na prescrição de {{ $checkoutPrescription->diagnostico?->paciente?->name ?? 'paciente' }}.</p>
+                    </div>
+                    <a class="modal-close" href="{{ route('dashboard') }}"><i class="fa-solid fa-xmark"></i></a>
+                </div>
+                <div style="padding:22px;">
+                    @forelse($checkoutStockItems as $index => $item)
+                        <div class="soft-row" style="margin-bottom:10px;">
+                            <input type="hidden" name="items[{{ $index }}][id]" value="{{ $item->id }}">
+                            <div>
+                                <strong>{{ $item->name }}</strong>
+                                <p class="muted">Disponível: {{ $item->quantity }} {{ $item->unit }}</p>
+                            </div>
+                            <input name="items[{{ $index }}][quantity]" type="number" min="0" max="{{ $item->quantity }}" value="0" style="width:110px;border:1px solid var(--bd);border-radius:12px;background:var(--sf);color:var(--tx);padding:10px 12px;font-weight:800;">
+                        </div>
+                    @empty
+                        <div class="alert warning"><i class="fa-solid fa-circle-info"></i><span>A clínica ainda não possui itens cadastrados no estoque.</span></div>
+                    @endforelse
+                    <div class="std-actions">
+                        <a class="btn btn-ghost" href="{{ route('dashboard') }}">Pular</a>
+                        <button class="btn btn-primary" type="submit"><i class="fa-solid fa-check"></i>Registrar uso</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    @endif
+
+    <section x-show="tab === 'profile'" x-cloak data-profile-tab="profile" class="tab-card">
         <div class="view-head"><div><h1 class="view-title">Meu Perfil</h1><p class="muted">Informações públicas da sua conta.</p></div></div>
         <article class="card" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
             <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" style="width:82px;height:82px;border-radius:50%;object-fit:cover;">
@@ -578,7 +793,7 @@
         </article>
     </section>
 
-    <section x-show="tab === 'settings'" x-cloak class="tab-card">
+    <section x-show="tab === 'settings'" x-cloak data-profile-tab="settings" class="tab-card">
         <div class="view-head"><div><h1 class="view-title">Configurações</h1><p class="muted">Dados pessoais, notificações e segurança.</p></div></div>
         <div class="settings-grid">
             <article class="card settings-card">
@@ -616,4 +831,137 @@
         </article>
     </section>
 </div>
+
+<script>
+window.syncProfileHashTabs = function() {
+    const shell = document.getElementById('profileShell');
+    if (!shell) return;
+
+    const rawTab = (window.location.hash || '#dashboard').slice(1) || 'dashboard';
+    const panels = Array.from(shell.querySelectorAll('[data-profile-tab]'));
+    const hasMatch = panels.some(panel => (panel.dataset.profileTab || '').split(/\s+/).includes(rawTab));
+    const activeTab = hasMatch ? rawTab : 'dashboard';
+
+    panels.forEach(panel => {
+        const keys = (panel.dataset.profileTab || '').split(/\s+/);
+        panel.removeAttribute('x-cloak');
+        panel.style.display = keys.includes(activeTab) ? '' : 'none';
+    });
+};
+
+window.addEventListener('hashchange', window.syncProfileHashTabs);
+window.addEventListener('DOMContentLoaded', window.syncProfileHashTabs);
+window.addEventListener('pageshow', window.syncProfileHashTabs);
+
+// Funções globais para gerenciar sintomas do modal de nova consulta
+window.addRequestSymptom = function(appState, id, name) {
+    console.log('addRequestSymptom called with:', { appState, id, name, currentSymptoms: appState.requestSelectedSymptoms });
+    
+    if(!appState.requestSelectedSymptoms.find(s => s.id == id)){
+        appState.requestSelectedSymptoms.push({id, name});
+        console.log('Symptom added, new list:', appState.requestSelectedSymptoms);
+        window.renderRequestSelectedSymptoms(appState);
+    } else {
+        console.log('Symptom already exists');
+    }
+    document.getElementById('requestSymptomSearch').value = '';
+    document.getElementById('requestSymptomsDropdown').style.display = 'none';
+};
+
+window.removeRequestSymptom = function(appState, id) {
+    appState.requestSelectedSymptoms = appState.requestSelectedSymptoms.filter(s => s.id != id);
+    window.renderRequestSelectedSymptoms(appState);
+};
+
+window.renderRequestSelectedSymptoms = function(appState) {
+    console.log('Rendering symptoms:', appState.requestSelectedSymptoms);
+    const container = document.getElementById('requestSelectedSymptoms');
+    if(!container) {
+        console.error('Container not found');
+        return;
+    }
+    
+    if(appState.requestSelectedSymptoms.length === 0) {
+        container.innerHTML = '<p class="muted" style="font-size:.85rem;margin:0;">Nenhum sintoma adicionado</p>';
+        return;
+    }
+    
+    window.__clinicalyAppState = appState;
+    
+    container.innerHTML = appState.requestSelectedSymptoms.map(s => {
+        return '<div style="background:var(--in);border:1.5px solid var(--il);color:#fff;padding:7px 14px;border-radius:999px;font-size:.85rem;font-weight:800;display:inline-flex;align-items:center;gap:8px;"><span>'+s.name+'</span><button type="button" onclick="window.removeRequestSymptom(window.__clinicalyAppState, '+s.id+');" style="background:none;border:none;color:#fff;cursor:pointer;font-size:.9rem;"><i class="fa-solid fa-xmark"></i></button></div>';
+    }).join('');
+    const ids = appState.requestSelectedSymptoms.map(s => s.id);
+    const hiddenInput = document.getElementById('requestSymptomIds');
+    if(hiddenInput) hiddenInput.value = JSON.stringify(ids);
+    console.log('Symptoms rendered, hidden input updated with IDs:', ids);
+};
+
+window.prepareClinicFormSubmit = function(appState, event) {
+    const symptomIds = appState.requestSelectedSymptoms.map(s => s.id);
+    symptomIds.forEach(id => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'symptoms[]';
+        input.value = id;
+        event.target.appendChild(input);
+    });
+    return true;
+};
+
+window.searchRequestSymptoms = function() {
+    const query = document.getElementById('requestSymptomSearch').value.toLowerCase();
+    const dropdown = document.getElementById('requestSymptomsDropdown');
+    const input = document.getElementById('requestSymptomSearch');
+    
+    // Procura o elemento x-data mais próximo (pai)
+    let el = input ? input.closest('[x-data]') : null;
+    if(!el) el = document.querySelector('[x-data]');
+    
+    // Alpine 3.x armazena dados em _x_dataStack
+    let appState = el?._x_dataStack?.[0];
+    if(!appState) {
+        console.error('Alpine component not found', { el, dataStack: el?._x_dataStack });
+        return;
+    }
+    
+    console.log('Search query:', query);
+    console.log('All symptoms:', appState.allConsultationSymptoms);
+    
+    if (query.length < 1) {
+        dropdown.style.display = 'none';
+        return;
+    }
+    
+    const filtered = appState.allConsultationSymptoms.filter(s => 
+        s.name && s.name.toLowerCase().includes(query)
+    );
+    
+    console.log('Filtered results:', filtered);
+    
+    if (filtered.length === 0) {
+        dropdown.innerHTML = '<div style="padding:12px 16px;color:var(--mu);font-size:.9rem;">Nenhum sintoma encontrado</div>';
+        dropdown.style.display = 'block';
+        return;
+    }
+    
+    // Armazena o appState no escopo global para os botões acessarem
+    window.__clinicalyAppState = appState;
+    
+    dropdown.innerHTML = filtered.map(s => {
+        return '<button type="button" onclick="window.addRequestSymptom(window.__clinicalyAppState, '+s.id+', \''+s.name.replace(/'/g, "\\'")+'\');" style="width:100%;text-align:left;padding:12px 16px;border-bottom:1px solid var(--bd);background:transparent;color:var(--tx);border:none;cursor:pointer;transition:background .2s;font-weight:600;font-size:.9rem;font-family:\'Dosis\',sans-serif;" onmouseover="this.style.background=\'var(--is)\'" onmouseout="this.style.background=\'transparent\'">+ '+s.name+'</button>';
+    }).join('');
+    
+    dropdown.style.display = 'block';
+};
+
+function searchRequestSymptomsAddItem(id, name) {
+    const el = document.querySelector('[x-data]');
+    let appState = el?._x_dataStack?.[0];
+    if(appState) {
+        window.addRequestSymptom(appState, id, name);
+    }
+}
+</script>
+
 </x-app-layout>

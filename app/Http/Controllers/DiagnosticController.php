@@ -82,6 +82,7 @@ class DiagnosticController extends Controller
         $diagnostico->update([
             'status' => 'validado',
             'id_medico' => Auth::id(),
+            'clinic_id' => Auth::user()?->clinic_id,
             'id_doenca' => $this->resolveDiseaseId($request->doenca_confirmada, $diagnostico),
             'doenca_final' => $request->doenca_confirmada,
             'parecer_medico' => [
@@ -138,6 +139,10 @@ class DiagnosticController extends Controller
     public function profile()
     {
         $user = Auth::user();
+
+        if ($user->isClinic()) {
+            return redirect()->route('clinic.index');
+        }
 
         $pacientes = Diagnostico::with('paciente')
             ->latest()
@@ -202,7 +207,7 @@ class DiagnosticController extends Controller
 
         // Carrega prescrições relacionadas aos diagnósticos do usuário
         $minhasPrescricoes = collect();
-        if ($user->role === 'pacient') {
+        if ($user->isPatient()) {
             $minhasPrescricoes = \App\Models\Prescription::with(['diagnostico.doenca', 'diagnostico.paciente', 'diagnostico.medico', 'monitorings.intakeLogs'])
                 ->whereHas('diagnostico', function ($query) use ($user) {
                     $query->where('id_paciente', $user->id);
@@ -212,7 +217,7 @@ class DiagnosticController extends Controller
         }
 
         $prescricoesMedico = collect();
-        if (in_array($user->role, ['doctor', 'medico', 'médico'], true)) {
+        if ($user->isDoctor()) {
             $prescricoesMedico = Prescription::with(['diagnostico.paciente', 'diagnostico.medico', 'diagnostico.doenca', 'monitorings.intakeLogs'])
                 ->whereHas('diagnostico', function ($query) use ($user) {
                     $query->where('id_medico', $user->id);
@@ -223,14 +228,54 @@ class DiagnosticController extends Controller
 
         $agendaData = app(AppointmentController::class)->agendaData();
 
-        return view('profile.show', compact('user', 'pacientes', 'filaDiagnosticos', 'meusDiagnosticos', 'minhasPrescricoes', 'prescricoesMedico', 'agendaData'));
+        $clinicOptions = collect();
+        $consultationSymptoms = collect();
+
+        if ($user->isPatient()) {
+            $consultationSymptoms = Symptom::orderBy('name')->get(['id', 'name']);
+
+            $clinicOptions = User::with(['employees' => function ($query) {
+                    $query->where('is_available', true)
+                        ->where(fn ($inner) => $inner->where('role', User::ROLE_DOCTOR)->orWhere('role', 'doctor')->orWhere('role', 'médico'))
+                        ->orderBy('name');
+                }])
+                ->where(fn ($query) => $query
+                    ->where('role', User::ROLE_CLINIC)
+                    ->orWhere('role', 'clinic')
+                    ->orWhere('role', 'clínica')
+                )
+                ->orderBy('name')
+                ->get()
+                ->filter(fn ($clinic) => $clinic->isOpenNow())
+                ->map(fn ($clinic) => [
+                    'id' => $clinic->id,
+                    'name' => $clinic->name,
+                    'activity_hours' => $clinic->activity_hours,
+                    'doctors' => $clinic->employees->map(fn ($doctor) => [
+                        'id' => $doctor->id,
+                        'name' => $doctor->name,
+                        'specialty' => $doctor->specialty,
+                    ])->values(),
+                ])
+                ->values();
+        }
+
+        $checkoutPrescription = null;
+        $checkoutStockItems = collect();
+
+        if ($user->isDoctor() && session('stock_checkout_prescription_id') && $user->clinic_id) {
+            $checkoutPrescription = Prescription::with(['diagnostico.paciente'])->find(session('stock_checkout_prescription_id'));
+            $checkoutStockItems = \App\Models\ClinicStockItem::where('clinic_id', $user->clinic_id)->orderBy('name')->get();
+        }
+
+        return view('profile.show', compact('user', 'pacientes', 'filaDiagnosticos', 'meusDiagnosticos', 'minhasPrescricoes', 'prescricoesMedico', 'agendaData', 'clinicOptions', 'consultationSymptoms', 'checkoutPrescription', 'checkoutStockItems'));
     }
 
     public function resultado(Diagnostico $diagnostico)
     {
         $diagnostico->load(['paciente', 'doenca']);
 
-        if (! in_array(Auth::user()->role ?? '', ['doctor', 'medico', 'médico'], true) && $diagnostico->id_paciente !== Auth::id()) {
+        if (! Auth::user()->isDoctor() && $diagnostico->id_paciente !== Auth::id()) {
             abort(403);
         }
 

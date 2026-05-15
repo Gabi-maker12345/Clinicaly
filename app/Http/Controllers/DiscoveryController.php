@@ -39,13 +39,12 @@ class DiscoveryController extends Controller
             'categories'  => $categories,
             'medications' => $medications,
             'patients'    => \App\Models\User::where('role', 'pacient')->orderBy('name')->get(),
+            'diagnosticPrefill' => session('diagnostic_prefill'),
         ]);
     }
 
     private function appendClinicalSummaries($items, string $type): void
     {
-        $missing = [];
-
         foreach ($items as $item) {
             $existingDescription = $item->description
                 ?? $item->descriptions->first()?->content
@@ -59,21 +58,7 @@ class DiscoveryController extends Controller
             $cacheKey = $this->clinicalSummaryCacheKey($type, $item->name);
             $cached = Cache::get($cacheKey);
 
-            if ($cached) {
-                $item->setAttribute('brief_description', $cached);
-            } else {
-                $missing[$item->name] = $item;
-            }
-        }
-
-        foreach (array_chunk(array_keys($missing), 20) as $names) {
-            $generated = $this->generateClinicalSummariesWithGroq($type, $names);
-
-            foreach ($names as $name) {
-                $summary = $generated[$name] ?? $this->fallbackClinicalSummary($type, $name);
-                Cache::put($this->clinicalSummaryCacheKey($type, $name), $summary, now()->addDays(30));
-                $missing[$name]->setAttribute('brief_description', $summary);
-            }
+            $item->setAttribute('brief_description', $cached ?: $this->fallbackClinicalSummary($type, $item->name));
         }
     }
 
@@ -165,6 +150,19 @@ class DiscoveryController extends Controller
             'peso'   => (float) $request->input('weight'),
             'altura' => (float) $request->input('height'),
         ];
+
+        $clinicalRequest = array_filter([
+            'description' => $request->input('clinical_request_description'),
+            'evolution' => $request->input('clinical_request_evolution'),
+            'triggers' => $request->input('clinical_request_triggers'),
+            'medical_history' => $request->input('clinical_request_medical_history'),
+            'context' => $request->input('clinical_request_context'),
+            'submitted_at' => $request->input('clinical_request_submitted_at'),
+        ], fn ($value) => filled($value));
+
+        if ($clinicalRequest) {
+            $perfil['pedido_clinico'] = $clinicalRequest;
+        }
 
         // Get symptom IDs from either the hidden JSON field or the items array
         $symptomIds = [];
@@ -381,8 +379,9 @@ class DiscoveryController extends Controller
 
             try {
                 $diagnostico = Diagnostico::create([
-                    'id_medico'         => (Auth::user()?->role === 'doctor') ? Auth::id() : null,
+                    'id_medico'         => Auth::user()?->isDoctor() ? Auth::id() : null,
                     'id_paciente'       => $pacienteId,
+                    'clinic_id'         => Auth::user()?->clinic_id,
                     'doencas_sugeridas' => $top4,
                     'id_sintomas'       => $symptomIds,
                     'links_referencia'  => $linksIA,

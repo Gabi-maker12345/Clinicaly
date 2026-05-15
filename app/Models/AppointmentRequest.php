@@ -10,6 +10,7 @@ class AppointmentRequest extends Model
     protected $fillable = [
         'patient_id',
         'doctor_id',
+        'clinic_id',
         'prescription_id',
         'diagnostico_id',
         'scheduled_for',
@@ -34,6 +35,11 @@ class AppointmentRequest extends Model
     public function doctor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'doctor_id');
+    }
+
+    public function clinic(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'clinic_id');
     }
 
     public function prescription(): BelongsTo

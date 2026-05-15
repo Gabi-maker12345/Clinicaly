@@ -1,8 +1,12 @@
 @php
     $authUser = auth()->user();
     $role = $authUser?->role ?? 'pacient';
-    $isDoctor = in_array($role, ['doctor', 'medico', 'médico'], true);
-    $roleLabel = $isDoctor ? 'Médico' : 'Paciente';
+    $normalizedRole = mb_strtolower(trim((string) $role));
+    $isDoctor = $authUser?->isDoctor() ?? false;
+    $isClinic = ($authUser?->isClinic() ?? false)
+        || in_array($normalizedRole, ['clinica', 'clínica', 'clinic'], true)
+        || request()->routeIs('clinic.*');
+    $roleLabel = $authUser?->roleLabel() ?? 'Paciente';
     $pendingCount = 0;
     $notificationCount = 0;
 
@@ -72,6 +76,21 @@
         .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(10,8,20,.4);backdrop-filter:blur(2px);z-index:89}.app-sidebar{position:fixed;top:var(--topbar-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--sf);border-right:1px solid var(--bd);z-index:90;display:flex!important;flex-direction:column;overflow-y:auto;padding:20px 14px 24px;transition:transform .28s;scrollbar-width:none;-ms-overflow-style:none}.app-sidebar::-webkit-scrollbar{width:0;height:0;display:none}.side-profile{display:flex;align-items:center;gap:10px;padding:12px;background:var(--sf2);border:1px solid var(--bd);border-radius:12px;margin-bottom:16px}.side-profile img{width:38px;height:38px;border-radius:50%;object-fit:cover}.side-profile strong{display:block;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.side-profile span{color:var(--mu);font:700 .48rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.1em}
         .sn{padding:0 0 8px}.sn-title{display:block;padding:14px 12px 5px;color:var(--fa);font:700 .48rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.14em}.sn a{display:flex;align-items:center;gap:10px;min-height:40px;padding:9px 12px;border-radius:10px;color:var(--mu);text-decoration:none;font-size:.88rem;font-weight:600}.sn a i{width:30px;height:30px;border-radius:8px;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.82rem}.sn a:hover,.sn a.active{background:var(--is);color:var(--in);font-weight:700}.sn a:hover i,.sn a.active i{background:var(--id)}.nav-badge{margin-left:auto;color:#fff;background:var(--rd);font:800 .52rem 'Space Mono',monospace;padding:2px 8px;border-radius:20px}
         .app-main{padding-top:var(--topbar-h);margin-left:var(--sidebar-w);min-height:100vh}.content-wrap{width:100%;max-width:none;margin:0;padding:32px 36px 80px}
+        body.clinic-layout .app-sidebar,body.clinic-layout .sidebar-overlay,body.clinic-layout .hamb{display:none!important}
+        body.clinic-layout .app-main{margin-left:0!important}
+        body.clinic-layout .content-wrap{padding-left:24px!important;padding-right:24px!important}
+        body[data-user-role="clinica"] .app-sidebar,
+        body[data-user-role="clínica"] .app-sidebar,
+        body[data-user-role="clinic"] .app-sidebar,
+        body[data-user-role="clinica"] .sidebar-overlay,
+        body[data-user-role="clínica"] .sidebar-overlay,
+        body[data-user-role="clinic"] .sidebar-overlay,
+        body[data-user-role="clinica"] .hamb,
+        body[data-user-role="clínica"] .hamb,
+        body[data-user-role="clinic"] .hamb{display:none!important}
+        body[data-user-role="clinica"] .app-main,
+        body[data-user-role="clínica"] .app-main,
+        body[data-user-role="clinic"] .app-main{margin-left:0!important}
         .card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--sh);padding:24px}.tag,.tg{display:inline-flex;align-items:center;gap:6px;border-radius:999px;border:1px solid var(--bd);background:var(--sf2);color:var(--mu);font:700 .68rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.08em;padding:5px 11px}.tag.success,.tag-green,.tg-gr{background:var(--gb);color:var(--gr);border-color:var(--gbd)}.tag.danger,.tag-red,.tg-rd{background:var(--rb);color:var(--rd);border-color:var(--rbd)}.tag.warn,.tag-amber,.tg-am{background:var(--wb);color:var(--wn);border-color:var(--wbd)}.tag.info,.tag-purple,.tg-pu{background:var(--is);color:var(--in);border-color:var(--id)}.tag-blue{background:var(--bb);color:var(--bl);border-color:var(--bbd)}.tag-grey{background:var(--sf2);color:var(--mu);border-color:var(--bd)}
         .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;border:1.5px solid transparent;padding:10px 18px;font:800 .9rem 'Dosis',sans-serif;text-decoration:none;cursor:pointer;transition:.18s;white-space:nowrap}.btn-primary,.b-pr{background:var(--in);color:#fff}.btn-primary:hover,.b-pr:hover{background:var(--il)}.btn-ghost,.b-gh{background:var(--sf2);color:var(--mu);border-color:var(--bd)}.btn-ghost:hover,.b-gh:hover{background:var(--is);color:var(--in);border-color:var(--in)}.btn-danger,.btn-red,.b-rd{background:var(--rb);color:var(--rd);border-color:var(--rbd)}.btn-danger:hover,.btn-red:hover,.b-rd:hover{background:var(--rd);color:#fff}.btn-green{background:var(--gb);color:var(--gr);border-color:var(--gbd)}.btn-green:hover{background:var(--gr);color:#fff}.btn-blue{background:var(--bb);color:var(--bl);border-color:var(--bbd)}.btn-sm,.bsm{padding:7px 13px;font-size:.8rem}.btn-xs{padding:5px 11px;font-size:.74rem}
         .kpi-card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:22px;box-shadow:var(--sh)}.kpi-card .value{font-size:2rem;font-weight:800;line-height:1;color:var(--in)}.kpi-card .label{margin-top:8px;color:var(--mu);font:700 .68rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.1em}
@@ -81,12 +100,14 @@
         @media(max-width:767px){.hamb{display:inline-flex;align-items:center;justify-content:center}.app-logo{min-width:auto}.app-logo img{width:128px}.app-search{display:none}.user-meta{display:none}.app-sidebar{transform:translateX(-100%)}.app-main{margin-left:0}.content-wrap{padding:24px 16px 56px}body.sidebar-open .app-sidebar{transform:translateX(0);box-shadow:var(--sh3)}body.sidebar-open .sidebar-overlay{display:block}.top-actions{gap:6px}}
     </style>
 </head>
-<body>
+<body class="{{ $isClinic ? 'clinic-layout' : '' }}" data-user-role="{{ $normalizedRole }}">
     <x-banner />
 
     <header class="app-topbar">
-        <button type="button" class="hamb" id="sidebar-open" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
-        <a href="{{ route('profile.show') }}#dashboard" class="app-logo" title="Clinicaly">
+        @unless($isClinic)
+            <button type="button" class="hamb" id="sidebar-open" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+        @endunless
+        <a href="{{ $isClinic ? route('clinic.index') : route('profile.show') . '#dashboard' }}" class="app-logo" title="Clinicaly">
             <img src="{{ asset('Proosta-logo4.png') }}" alt="Clinicaly">
         </a>
         <form class="app-search" role="search" action="{{ route('messages.index') }}" method="GET">
@@ -95,16 +116,18 @@
         </form>
         <nav class="top-actions" aria-label="Ações globais">
             <a href="{{ route('messages.index') }}" class="icon-btn" aria-label="Conversas"><i class="fa-solid fa-comment-dots"></i></a>
+            <a href="{{ route('multi-accounts.index') }}" class="icon-btn {{ request()->routeIs('multi-accounts.*') ? 'active' : '' }}" aria-label="Contas conectadas"><i class="fa-solid fa-user-group"></i></a>
             <a href="{{ route('notifications.index') }}" class="icon-btn {{ request()->routeIs('notifications.*') ? 'active' : '' }}" aria-label="Notificações"><i class="fa-solid fa-bell"></i>@if($notificationCount)<span class="notify-dot"></span>@endif</a>
             <input type="checkbox" id="theme-toggle" aria-label="Alternar tema">
             <label for="theme-toggle" class="theme-ui" title="Alternar tema"><i class="fa-solid fa-moon moon"></i><i class="fa-solid fa-sun sun"></i></label>
-            <a href="{{ route('profile.show') }}#profile" class="user-chip">
+            <a href="{{ $isClinic ? route('clinic.index') : route('profile.show') . '#profile' }}" class="user-chip">
                 <img src="{{ $authUser?->profile_photo_url }}" alt="{{ $authUser?->name }}">
                 <span class="user-meta"><strong>{{ $authUser?->name }}</strong><span>{{ $roleLabel }}</span></span>
             </a>
         </nav>
     </header>
 
+    @unless($isClinic)
     <button class="sidebar-overlay" id="sidebar-close" type="button" aria-label="Fechar menu"></button>
     <aside class="app-sidebar" aria-label="Navegação principal">
         <div class="side-profile">
@@ -113,6 +136,12 @@
         </div>
         <nav class="sn">
             <span class="sn-title">Principal</span>
+            @if($isClinic)
+                <a href="{{ route('clinic.index', ['tab' => 'employees']) }}"><i class="fa-solid fa-user-doctor"></i>Meus Funcionários</a>
+                <a href="{{ route('clinic.index', ['tab' => 'patients']) }}"><i class="fa-solid fa-hospital-user"></i>Pacientes</a>
+                <a href="{{ route('clinic.index', ['tab' => 'stock']) }}"><i class="fa-solid fa-boxes-stacked"></i>Estoque</a>
+                <a href="{{ route('clinic.index', ['tab' => 'appointments']) }}"><i class="fa-solid fa-calendar-days"></i>Agendamentos</a>
+            @else
             <a href="{{ route('profile.show') }}#dashboard"><i class="fa-solid fa-table-cells-large"></i>Dashboard</a>
             @if($isDoctor)
                 <a href="{{ route('profile.show') }}#fila"><i class="fa-solid fa-list-check"></i>Fila de Validação @if($pendingCount)<span class="nav-badge">{{ $pendingCount }}</span>@endif</a>
@@ -123,6 +152,7 @@
             @endif
             <a href="{{ route('profile.show') }}#prescricoes"><i class="fa-solid fa-file-prescription"></i>Prescrições</a>
             <a href="{{ route('messages.index') }}" class="{{ request()->routeIs('messages.*') ? 'active' : '' }}"><i class="fa-solid fa-comments"></i>Minhas Conversas</a>
+            @endif
         </nav>
         <nav class="sn">
             <span class="sn-title">Análise</span>
@@ -132,14 +162,15 @@
         </nav>
         <nav class="sn">
             <span class="sn-title">Perfil</span>
-            <a href="{{ route('profile.show') }}#profile"><i class="fa-solid fa-user"></i>Meu Perfil</a>
-            <a href="{{ route('profile.show') }}#settings"><i class="fa-solid fa-gear"></i>Configurações</a>
+            <a href="{{ $isClinic ? route('clinic.index') : route('profile.show') . '#profile' }}"><i class="fa-solid fa-user"></i>Meu Perfil</a>
+            <a href="{{ $isClinic ? route('clinic.index') : route('profile.show') . '#settings' }}"><i class="fa-solid fa-gear"></i>Configurações</a>
         </nav>
         <form method="POST" action="{{ route('logout') }}" style="padding:16px 12px;margin-top:auto;">
             @csrf
             <button type="submit" class="btn btn-danger" style="width:100%;"><i class="fa-solid fa-right-from-bracket"></i>Sair</button>
         </form>
     </aside>
+    @endunless
 
     <main class="app-main">
         <div class="content-wrap">
@@ -167,6 +198,102 @@
             document.getElementById('sidebar-open')?.addEventListener('click', () => document.body.classList.add('sidebar-open'));
             document.getElementById('sidebar-close')?.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
             window.addEventListener('pageshow', () => setTheme(localStorage.getItem(key) || 'light'));
+
+            const scopedRole = new URLSearchParams(window.location.search).get('as_role');
+
+            if (scopedRole) {
+                const applyRoleToUrl = (value) => {
+                    const url = new URL(value, window.location.origin);
+
+                    if (url.origin !== window.location.origin) {
+                        return value;
+                    }
+
+                    if (['/logout', '/login', '/register'].includes(url.pathname)) {
+                        return value;
+                    }
+
+                    url.searchParams.set('as_role', scopedRole);
+
+                    return url.toString();
+                };
+
+                const applyScopedRoleToLinks = (rootNode = document) => {
+                    rootNode.querySelectorAll?.('a[href]').forEach((link) => {
+                        const href = link.getAttribute('href');
+
+                        if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) {
+                            return;
+                        }
+
+                        link.setAttribute('href', applyRoleToUrl(href));
+                    });
+                };
+
+                const applyScopedRoleToForm = (form) => {
+                    const action = form.getAttribute('action') || window.location.href;
+                    const url = new URL(action, window.location.origin);
+
+                    if (url.origin !== window.location.origin || url.pathname === '/logout') {
+                        return;
+                    }
+
+                    if (!form.querySelector('input[name="as_role"]')) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'as_role';
+                        input.value = scopedRole;
+                        form.appendChild(input);
+                    }
+                };
+
+                applyScopedRoleToLinks();
+                document.querySelectorAll('form').forEach(applyScopedRoleToForm);
+
+                document.addEventListener('click', (event) => {
+                    const link = event.target.closest?.('a[href]');
+                    if (!link) return;
+
+                    const href = link.getAttribute('href');
+                    if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) {
+                        return;
+                    }
+
+                    link.setAttribute('href', applyRoleToUrl(href));
+                }, true);
+
+                document.addEventListener('submit', (event) => {
+                    if (event.target instanceof HTMLFormElement) {
+                        applyScopedRoleToForm(event.target);
+                    }
+                }, true);
+
+                if (window.MutationObserver) {
+                    new MutationObserver((mutations) => {
+                        mutations.forEach((mutation) => {
+                            mutation.addedNodes.forEach((node) => {
+                                if (node.nodeType === Node.ELEMENT_NODE) {
+                                    applyScopedRoleToLinks(node);
+                                    if (node instanceof HTMLFormElement) {
+                                        applyScopedRoleToForm(node);
+                                    }
+                                    node.querySelectorAll?.('form').forEach(applyScopedRoleToForm);
+                                }
+                            });
+                        });
+                    }).observe(document.body, {childList: true, subtree: true});
+                }
+
+                const originalFetch = window.fetch;
+
+                window.fetch = (input, init = {}) => {
+                    if (typeof input === 'string' || input instanceof URL) {
+                        input = applyRoleToUrl(input.toString());
+                    }
+
+                    return originalFetch(input, init);
+                };
+            }
         })();
     </script>
 </body>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AppointmentRequest;
 use App\Models\Conversation;
 use App\Models\Prescription;
+use App\Models\User;
 use App\Notifications\AppointmentRequested;
 use App\Notifications\AppointmentStatusUpdated;
 use Illuminate\Http\Request;
@@ -23,12 +24,13 @@ class AppointmentController extends Controller
     {
         $user = Auth::user();
 
-        if ($this->isDoctor($user)) {
+        if ($this->isDoctor($user) || $user?->isClinic()) {
             abort(403);
         }
 
         $data = $request->validate([
             'doctor_id' => ['required', 'exists:users,id'],
+            'clinic_id' => ['nullable', 'exists:users,id'],
             'prescription_id' => ['nullable', 'exists:prescriptions,id'],
             'scheduled_date' => ['required', 'date', 'after_or_equal:today'],
             'scheduled_time' => ['required', 'date_format:H:i'],
@@ -37,15 +39,26 @@ class AppointmentController extends Controller
             'reason' => ['nullable', 'string', 'max:1200'],
         ]);
 
-        $prescription = Prescription::with('diagnostico')
-            ->where('id', $data['prescription_id'])
-            ->whereHas('diagnostico', function ($query) use ($user, $data) {
-                $query->where('id_paciente', $user->id)
-                    ->where('id_medico', $data['doctor_id']);
-            })
-            ->first();
+        $doctor = User::findOrFail($data['doctor_id']);
+        $clinicId = $data['clinic_id'] ?? $doctor->clinic_id;
 
-        if (! $prescription) {
+        if ($clinicId && (int) $doctor->clinic_id !== (int) $clinicId) {
+            abort(422, 'O médico selecionado não pertence à clínica informada.');
+        }
+
+        $prescription = null;
+
+        if (! empty($data['prescription_id'])) {
+            $prescription = Prescription::with('diagnostico')
+                ->where('id', $data['prescription_id'])
+                ->whereHas('diagnostico', function ($query) use ($user, $data) {
+                    $query->where('id_paciente', $user->id)
+                        ->where('id_medico', $data['doctor_id']);
+                })
+                ->first();
+        }
+
+        if (! $prescription && ! $clinicId) {
             $prescription = Prescription::with('diagnostico')
                 ->whereHas('diagnostico', function ($query) use ($user, $data) {
                     $query->where('id_paciente', $user->id)
@@ -58,8 +71,9 @@ class AppointmentController extends Controller
         $appointment = AppointmentRequest::create([
             'patient_id' => $user->id,
             'doctor_id' => $data['doctor_id'],
-            'prescription_id' => $prescription->id,
-            'diagnostico_id' => $prescription->diagnostico_id,
+            'clinic_id' => $clinicId,
+            'prescription_id' => $prescription?->id,
+            'diagnostico_id' => $prescription?->diagnostico_id,
             'scheduled_for' => $data['scheduled_date'] . ' ' . $data['scheduled_time'],
             'consultation_type' => $data['consultation_type'],
             'mode' => $data['mode'],
@@ -136,9 +150,10 @@ class AppointmentController extends Controller
         $user = Auth::user();
         $isDoctor = $this->isDoctor($user);
 
-        $appointments = AppointmentRequest::with(['patient', 'doctor', 'prescription.monitorings', 'diagnostico.doenca'])
+        $appointments = AppointmentRequest::with(['patient', 'doctor', 'clinic', 'prescription.monitorings', 'diagnostico.doenca'])
+            ->when($user?->isClinic(), fn ($query) => $query->where('clinic_id', $user->id))
             ->when($isDoctor, fn ($query) => $query->where('doctor_id', $user->id))
-            ->when(! $isDoctor, fn ($query) => $query->where('patient_id', $user->id))
+            ->when(! $isDoctor && ! $user?->isClinic(), fn ($query) => $query->where('patient_id', $user->id))
             ->orderByRaw("CASE status WHEN 'pending' THEN 0 WHEN 'accepted' THEN 1 WHEN 'rejected' THEN 2 ELSE 3 END")
             ->orderBy('scheduled_for')
             ->get();
@@ -194,6 +209,6 @@ class AppointmentController extends Controller
 
     private function isDoctor($user): bool
     {
-        return in_array($user?->role, ['doctor', 'medico', 'médico'], true);
+        return $user?->isDoctor() ?? false;
     }
 }

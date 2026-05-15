@@ -9,17 +9,28 @@
     .conversation-item:hover,.conversation-item.active{background:var(--is);color:var(--in)}
     .conversation-actions{display:flex;align-items:center;padding-right:10px}
     .chat-panel{display:flex;flex-direction:column;min-height:620px}
-    .chat-messages{flex:1;overflow-y:auto;padding:12px 6px 18px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--bd2) transparent}
-    .chat-messages::-webkit-scrollbar,.conversation-scroll::-webkit-scrollbar{width:4px}
-    .chat-messages::-webkit-scrollbar-track,.conversation-scroll::-webkit-scrollbar-track{background:transparent}
-    .chat-messages::-webkit-scrollbar-thumb,.conversation-scroll::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:999px}
-    .msg{display:block;width:auto;max-width:100%;min-width:2.75rem;margin:0;padding:10px 15px;border-radius:18px;font-weight:600;line-height:1.45;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;hyphens:auto;flex:0 1 auto}
-    .msg.received{background:var(--sf2);border:1px solid var(--bd);border-bottom-left-radius:5px;align-self:flex-start}
-    .msg.sent{background:var(--in);color:#fff;border-bottom-right-radius:5px;align-self:flex-end}
+    .chat-messages{flex:1;overflow-y:auto;padding:12px 6px 18px;display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
+    .chat-messages::-webkit-scrollbar,.conversation-scroll::-webkit-scrollbar{width:0;height:0}
+    .chat-bubble{display:inline-block;width:auto;height:auto;min-width:0;min-height:0;max-width:min(58ch,100%);margin:0;padding:10px 15px;border-radius:18px;font-weight:650;font-size:.96rem;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;hyphens:auto;flex:0 1 auto;text-align:left;vertical-align:top}
+    .chat-bubble.bubble-received{background:var(--sf2);border:1px solid var(--bd);border-bottom-left-radius:5px;align-self:flex-start}
+    .chat-bubble.bubble-sent{background:var(--in);color:#fff;border-bottom-right-radius:5px;align-self:flex-end}
+    .chat-bubble.bubble-pack{display:block;width:min(520px,100%);max-width:min(520px,100%);padding:12px}
+    .clinical-pack{margin-top:10px;padding:12px;border-radius:14px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);white-space:normal;text-align:left;width:100%;min-width:0;max-width:100%;overflow:hidden}
+    .chat-bubble.bubble-sent .clinical-pack{border-color:rgba(255,255,255,.26);background:rgba(255,255,255,.12);color:#fff}
+    .clinical-pack-title{display:flex;align-items:center;gap:8px;font:800 .62rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+    .clinical-pack-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+    .clinical-pack-kv{border:1px solid var(--bd);border-radius:10px;padding:8px;background:var(--sf2)}
+    .chat-bubble.bubble-sent .clinical-pack-kv{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.1)}
+    .clinical-pack-kv span{display:block;font:800 .54rem 'Space Mono',monospace;text-transform:uppercase;letter-spacing:.08em;opacity:.7}
+    .clinical-pack-kv strong{display:block;font-size:.82rem;margin-top:2px;overflow-wrap:anywhere;word-break:break-word}
+    .clinical-pack-text{font-weight:700;font-size:.82rem;line-height:1.5;margin:0;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;word-break:break-word}
+    .clinical-pack-symptoms{margin:8px 0 0;font-size:.78rem;font-weight:800;line-height:1.35;overflow-wrap:anywhere;word-break:break-word}
+    .clinical-pack-link{display:inline-flex;align-items:center;gap:8px;margin-top:8px;border-radius:999px;padding:8px 12px;background:var(--in);color:#fff;text-decoration:none;font-size:.78rem;font-weight:900}
+    .chat-bubble.bubble-sent .clinical-pack-link{background:#fff;color:var(--in)}
     .msg-meta{font:700 .62rem 'Space Mono',monospace;color:var(--fa);margin:0 0 4px}
     .msg-wrap{display:flex;flex-direction:column;align-items:flex-start;position:relative;width:100%;max-width:100%}
     .msg-wrap.sent{align-items:flex-end;text-align:right}
-    .msg-line{display:inline-flex;align-items:flex-start;gap:6px;width:auto;max-width:min(74ch,88%);min-width:0}
+    .msg-line{display:inline-flex;align-items:flex-start;gap:6px;width:auto;max-width:min(70ch,88%);min-width:0}
     .msg-wrap:not(.sent) .msg-line{align-self:flex-start}
     .msg-wrap.sent .msg-line{align-self:flex-end;flex-direction:row-reverse}
     .dots-btn{width:30px;height:30px;border-radius:999px;border:1px solid var(--bd);background:var(--sf2);color:var(--mu);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
@@ -40,7 +51,8 @@
     .search-result{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:0;border-bottom:1px solid var(--bd);background:transparent;color:var(--tx);text-align:left;cursor:pointer}
     .search-result:hover{background:var(--is)}
     body.conversation-modal-open{overflow:hidden!important}
-    @media(max-width:980px){.chat-shell{grid-template-columns:1fr}.chat-panel{min-height:560px}}
+    @media(max-width:980px){.chat-shell{grid-template-columns:1fr}.chat-panel{min-height:560px}.msg-line{max-width:96%}.chat-bubble.bubble-pack{max-width:100%}}
+    @media(max-width:560px){.clinical-pack-grid{grid-template-columns:1fr}.chat-bubble{max-width:100%}}
 </style>
 
 <div x-data="{
@@ -144,7 +156,33 @@
             openMenu: null,
             messages: @js($messages->load('user')),
             authId: {{ auth()->id() }},
+            scopedRole: new URLSearchParams(window.location.search).get('as_role'),
+            clinicalPackUrlTemplate: @js(route('clinical-requests.diagnose', '__MESSAGE_ID__')),
             scroll(){ this.$nextTick(() => { const el = this.$refs.messages; el.scrollTop = el.scrollHeight; }); },
+            clinicalPackUrl(msg){
+                const url = new URL(this.clinicalPackUrlTemplate.replace('__MESSAGE_ID__', msg.id), window.location.origin);
+                if(this.scopedRole) url.searchParams.set('as_role', this.scopedRole);
+                return url.toString();
+            },
+            bubbleStyle(msg){
+                const isPack = msg.type === 'clinical_pack';
+                return [
+                    'display:inline-flex',
+                    'align-items:center',
+                    'justify-content:flex-start',
+                    'width:' + (isPack ? 'min(520px,100%)' : 'max-content'),
+                    'max-width:' + (isPack ? 'min(520px,100%)' : 'min(58ch,100%)'),
+                    'height:auto',
+                    'min-width:0',
+                    'min-height:0',
+                    'padding:' + (isPack ? '12px' : '10px 15px'),
+                    'line-height:1.45',
+                    'white-space:pre-wrap',
+                    'overflow-wrap:anywhere',
+                    'word-break:break-word',
+                    'text-align:left'
+                ].join(';');
+            },
             edit(msg){ this.editingId = msg.id; this.editingBody = msg.body; this.openMenu = null; },
             cancelEdit(){ this.editingId = null; this.editingBody = ''; },
             async saveEdit(msg){
@@ -205,7 +243,29 @@
                         </template>
                         <template x-if="editingId !== msg.id">
                             <div class="msg-line">
-                                <p class="msg" :class="msg.user_id == authId ? 'sent' : 'received'" x-text="msg.body"></p>
+                                <div class="chat-bubble" :class="[(msg.user_id == authId ? 'bubble-sent' : 'bubble-received'), (msg.type === 'clinical_pack' ? 'bubble-pack' : '')]" :style="bubbleStyle(msg)">
+                                    <span style="display:inline;width:auto;max-width:100%;height:auto;line-height:1.45;overflow-wrap:anywhere;word-break:break-word;" x-text="(msg.body || '').trim()"></span>
+                                    <template x-if="msg.type === 'clinical_pack'">
+                                        <div class="clinical-pack">
+                                            <div class="clinical-pack-title"><i class="fa-solid fa-file-medical"></i> Pacote clínico</div>
+                                            <div class="clinical-pack-grid">
+                                                <div class="clinical-pack-kv"><span>Paciente</span><strong x-text="msg.payload?.patient_name || 'Paciente'"></strong></div>
+                                                <div class="clinical-pack-kv"><span>Clínica</span><strong x-text="msg.payload?.clinic_name || 'Clínica'"></strong></div>
+                                                <div class="clinical-pack-kv"><span>Idade</span><strong x-text="msg.payload?.age ? msg.payload.age + ' anos' : 'Não informado'"></strong></div>
+                                                <div class="clinical-pack-kv"><span>Biometria</span><strong x-text="`${msg.payload?.weight || '-'} kg · ${msg.payload?.height || '-'} m`"></strong></div>
+                                            </div>
+                                            <p class="clinical-pack-text" x-text="msg.payload?.description || 'Sem descrição clínica.'"></p>
+                                            <template x-if="Array.isArray(msg.payload?.symptoms) && msg.payload.symptoms.length">
+                                                <p class="clinical-pack-symptoms" x-text="'Sintomas: ' + msg.payload.symptoms.map(symptom => symptom.name).join(', ')"></p>
+                                            </template>
+                                            <template x-if="msg.payload?.doctor_id == authId">
+                                                <a class="clinical-pack-link" :href="clinicalPackUrl(msg)">
+                                                    <i class="fa-solid fa-stethoscope"></i> Abrir diagnóstico
+                                                </a>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
                                 <template x-if="msg.user_id == authId">
                                     <div style="position:relative;">
                                         <button type="button" class="dots-btn" @click.stop="openMenu = openMenu === msg.id ? null : msg.id" aria-label="Ações da mensagem"><i class="fa-solid fa-ellipsis-vertical"></i></button>

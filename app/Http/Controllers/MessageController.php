@@ -62,7 +62,7 @@ class MessageController extends Controller
 
         $message = $conversation->messages()->create([
             'user_id' => Auth::id(),
-            'body' => $request->body,
+            'body' => trim($request->body),
         ]);
 
         $conversation->touch();
@@ -85,7 +85,7 @@ class MessageController extends Controller
         ]);
 
         $message->update([
-            'body' => $request->body,
+            'body' => trim($request->body),
         ]);
 
         $message->conversation?->touch();

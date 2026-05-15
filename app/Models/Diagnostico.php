@@ -12,6 +12,7 @@ class Diagnostico extends Model
     protected $fillable = [
         'id_medico',
         'id_paciente',
+        'clinic_id',
         'id_doenca',
         'id_sintomas',
         'dados_biometricos',
@@ -42,6 +43,10 @@ class Diagnostico extends Model
 
     public function paciente() {
         return $this->belongsTo(User::class, 'id_paciente');
+    }
+
+    public function clinic() {
+        return $this->belongsTo(User::class, 'clinic_id');
     }
 
     public function doenca()

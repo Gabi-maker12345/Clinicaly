@@ -22,6 +22,8 @@ class CreateNewUser implements CreatesNewUsers
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'role' => ['required', 'string', 'in:'.implode(',', array_keys(User::accountRoles()))],
+            'activity_hours' => ['required_if:role,'.User::ROLE_CLINIC, 'nullable', 'string', 'max:80', 'regex:/^\s*\d{1,2}(?::\d{2})?\s*h?\s*[-–]\s*\d{1,2}(?::\d{2})?\s*h?\s*$/i'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
@@ -29,6 +31,8 @@ class CreateNewUser implements CreatesNewUsers
         return User::create([
             'name' => $input['name'],
             'email' => $input['email'],
+            'role' => $input['role'],
+            'activity_hours' => $input['activity_hours'] ?? null,
             'password' => Hash::make($input['password']),
         ]);
     }
